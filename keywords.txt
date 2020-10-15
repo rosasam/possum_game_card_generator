@@ -3,7 +3,7 @@ Discard
 Age
 Steal
 Stash
-Sneakpeek
+Peek
 Trap
 Draw
 Gain
