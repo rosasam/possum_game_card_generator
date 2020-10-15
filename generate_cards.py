@@ -144,7 +144,7 @@ def add_background(image, layer, tier):
 
 def add_picture(img, path):
     picture = Image.new('RGBA', (PIC_WIDTH, PIC_HEIGHT), color='red')
-    picture = Image.open(path)
+    picture = Image.open(path).convert('RGBA')
     width, height = picture.size
 
     left = (width - PIC_WIDTH)//2
@@ -155,7 +155,7 @@ def add_picture(img, path):
     # Crop the center of the image
     picture = picture.crop((left, top, right, bottom))
 
-    img.paste(picture, ((WIDTH - PIC_WIDTH) // 2, PIC_Y_POSITION))
+    img.paste(picture, ((WIDTH - PIC_WIDTH) // 2, PIC_Y_POSITION), picture)
 
 def write_title(d, text, tier):
     text = text.upper()
