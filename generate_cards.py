@@ -19,7 +19,7 @@ TEXT_LEFT_MARGIN = 50
 TITLE_FONTSIZE = 60
 TITLE_Y_POSITION = PIC_Y_POSITION + PIC_HEIGHT + 12
 DESCRIPTION_FONTSIZE = 35
-CHARACTERS_PER_ROW = 40
+CHARACTERS_PER_ROW = 44
 DESCRIPTION_Y_POSITION = TITLE_Y_POSITION + 100
 FLAVOUR_START_HEIGHT = HEIGHT - 300
 
@@ -27,6 +27,7 @@ FLAVOUR_START_HEIGHT = HEIGHT - 300
 CARD_SAVE_DIR = 'generated_cards'
 PICTURE_SOURCE_DIR = 'source_pictures'
 TEMPLATES_DIR = 'templates'
+KEYWORDS_FILE = 'keywords.txt'
 
 # Globals for grid generation
 GENERATE_GRID = True
@@ -34,18 +35,25 @@ MAX_GRID_WIDTH = 10
 MAX_GRID_HEIGHT = 7
 MAX_CARDS = MAX_GRID_WIDTH * MAX_GRID_HEIGHT
 
-
 def main(args):
     if len(args) < 2:
         print('Please provide filename for the csv.')
         exit()
 
     filename = args[1]
+    print(f'generating cards from csv:{filename}.')
     data = pd.read_csv(filename,keep_default_na=False,na_values=['NaN'])
     skipped = []
     generated = 0
 
-    print(f'generating cards from {filename}.')
+    # Read keyword file
+    if os.path.exists(KEYWORDS_FILE):
+        print('Keyword file found.')
+        with open(KEYWORDS_FILE, 'r') as f:
+           keywords = [line.strip().lower() for line in f.readlines()]
+    else:
+        print('––– No keyword file found –––')
+        keywords = []
 
     # Create directories for each tier
     if not os.path.exists(CARD_SAVE_DIR):
@@ -83,7 +91,7 @@ def main(args):
                 picturepath = os.path.join(PICTURE_SOURCE_DIR, picture) if picture else None
                 print(f'Generating {cardname}')
                 generate_card(
-                    tier, name, description, flavour, picturepath, cardpath
+                    tier, name, description, flavour, picturepath, cardpath, keywords
                 )
             generated += 1
         else:
@@ -103,7 +111,7 @@ def main(args):
 
 
 # Generates and saves a single card
-def generate_card(tier, name, description, flavour, picturepath, filename):
+def generate_card(tier, name, description, flavour, picturepath, filename, keywords):
     card = Image.new('RGBA', (WIDTH, HEIGHT))
     
     add_background(card, 'bottom', tier)
@@ -113,7 +121,7 @@ def generate_card(tier, name, description, flavour, picturepath, filename):
         except FileNotFoundError as e:
             print('--- WARNING ---')
             print(f'Picture file for {name} could not be found.')
-            print(f'Tried path: {picturepath}.')
+            print(f'Tried path: "{picturepath}"')
             print('---------------')
     add_background(card, 'top', tier)
     
@@ -121,7 +129,7 @@ def generate_card(tier, name, description, flavour, picturepath, filename):
     write_title(d, name, tier)
 
     if description:
-        description_bottom_y = write_description(d, description, tier)
+        description_bottom_y = write_description(d, description, tier, keywords)
     else:
         description_bottom_y = 0
     if flavour:
@@ -173,21 +181,40 @@ def write_title(d, text, tier):
         fill=color,
         font=font)
 
-def write_description(d, text, tier):
+def write_description(d, text, tier, keywords):
+    # DISCLAIMER:
+    # Keyword koden kommer att få dina ögon o blöda. 
     fontsize = DESCRIPTION_FONTSIZE
     color = 'white' if tier == 4 else 'black'
-    font = ImageFont.truetype('fonts/RobotoCondensed-Regular.ttf', fontsize)
-
     lines = textwrap.wrap(text, width=CHARACTERS_PER_ROW)
     y_text = DESCRIPTION_Y_POSITION
     for line in lines:
-        width, height = font.getsize(line)
-        d.text(
-            (TEXT_LEFT_MARGIN, y_text), 
-            line, 
-            fill=color,
-            font=font)
-        y_text += height
+        words = line.replace(',', ' ,').replace('.', ' .').split(' ')
+        heights = []
+        x_word = TEXT_LEFT_MARGIN
+
+        # Write text word by word to allow keyword highlighting
+        for i, word in enumerate(words):
+            if word.lower() in keywords:
+                word = word if word.isupper() else word.capitalize()
+                font = ImageFont.truetype('fonts/RobotoCondensed-Bold.ttf', fontsize)
+            else:
+                font = ImageFont.truetype('fonts/RobotoCondensed-Regular.ttf', fontsize)
+        
+            width, height = font.getsize(word)
+            heights.append(height)
+            d.text(
+                (x_word, y_text), 
+                word,
+                fill=color,
+                font=font)
+            
+            # Don't add whitespace if next character is a punctuation mark
+            if i + 1 < len(words) and words[i + 1] in ['.', ',']:
+                x_word += width
+            else:
+                x_word += width + 8
+        y_text += max(heights)
     return y_text
 
 def write_flavour(d, text, start_height, tier):
