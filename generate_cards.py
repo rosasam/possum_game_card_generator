@@ -74,7 +74,7 @@ def main(args):
         tier = row['Tier']
         name = row['Name']
         description = row['Effect']
-        flavour = row['Card text']
+        flavour = row['Flavor text']
         picture = row['Picture']
 
         if amount and name:
@@ -118,7 +118,7 @@ def generate_card(tier, name, description, flavour, picturepath, filename, keywo
     if picturepath:
         try:
             add_picture(card, picturepath)
-        except FileNotFoundError as e:
+        except Exception as e:
             print('--- WARNING ---')
             print(f'Picture file for {name} could not be found.')
             print(f'Tried path: "{picturepath}"')
