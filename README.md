@@ -5,6 +5,7 @@
 
 ## Setup
 - Place source images in `source_pictures` directory.
+    - Source images should be `650px` wide and `550p` tall. Larger sizes will be cropped to fit.
 - Place csv with correct columns in root directory.
 
 ## Usage
