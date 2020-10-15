@@ -13,9 +13,9 @@
 You can tweak global constants in the beginning of the file to modify directory names, font sizes, position of text, etc.
 
 ## Expected fields in the csv
-Amount
-Tier (optional)
-Name
-Effect (optional)
-Card text (optional)
-Picture (optional)
+- Amount
+- Tier (optional)
+- Name
+- Effect (optional)
+- Card text (optional)
+- Picture (optional)
