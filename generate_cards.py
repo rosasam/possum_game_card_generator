@@ -143,8 +143,6 @@ def add_background(image, layer, tier):
         filename = 'card_template_bot.png'
     elif layer == 'top':
         tier_name = get_tier_name(tier)
-        if tier_name in ['unknown', 'base', 'EGG', 'common']:
-            tier_name = 'common'
         filename = f'card_template_top_{tier_name}.png'
     background = Image.open(os.path.join(TEMPLATES_DIR, filename))
     assert background.size == (700, 1000)
