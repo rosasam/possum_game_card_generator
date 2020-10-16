@@ -35,6 +35,9 @@ MAX_GRID_WIDTH = 10
 MAX_GRID_HEIGHT = 7
 MAX_CARDS = MAX_GRID_WIDTH * MAX_GRID_HEIGHT
 
+# WINDOWS
+FORBIDDEN_CHARACTERS = ["/", "\\", ":", "*", "?" "'", "<", ">", "|"]
+
 def main(args):
     if len(args) < 2:
         print('Please provide filename for the csv.')
@@ -74,7 +77,7 @@ def main(args):
         tier = row['Tier']
         name = row['Name']
         description = row['Effect']
-        flavour = row['Flavor text']
+        flavour = row['Card text']
         picture = row['Picture']
 
         if amount and name:
@@ -86,7 +89,10 @@ def main(args):
                 os.makedirs(tier_path)
             # Generate 'amount' many cards
             for i in range(1, amount + 1):
+                # Windows filenames can't contains some special characters.
                 cardname = f"{get_tier_name(tier)}_{name.lower().replace(' ', '_')}_{i}"
+                for c in FORBIDDEN_CHARACTERS:
+                    cardname = cardname.replace(c, '')
                 cardpath = os.path.join(tier_path, cardname)
                 picturepath = os.path.join(PICTURE_SOURCE_DIR, picture) if picture else None
                 print(f'Generating {cardname}')
