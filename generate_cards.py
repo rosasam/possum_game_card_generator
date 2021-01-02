@@ -77,7 +77,7 @@ def main(args):
         tier = row['Tier']
         name = row['Name']
         description = row['Effect']
-        flavour = row['Card text']
+        flavour = row['Flavor text']
         picture = row['Picture']
 
         if amount and name:
