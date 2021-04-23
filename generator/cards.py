@@ -7,7 +7,7 @@ from utils.tiers import get_tier_name
 
 
 # Generates and saves a single card
-def generate_card(tier, name, description, flavour, picturepath, filename, keywords):
+def generate_card(tier, name, description, flavour, picturepath, filename):
     card = Image.new('RGBA', (config.WIDTH, config.HEIGHT))
 
     add_background(card, 'bottom', tier)
@@ -26,7 +26,7 @@ def generate_card(tier, name, description, flavour, picturepath, filename, keywo
 
     if description:
         description_bottom_y = write_description(
-            d, description, tier, keywords)
+            d, description, tier)
     else:
         description_bottom_y = 0
     if flavour:
@@ -82,7 +82,7 @@ def write_title(d, text, tier):
         font=font)
 
 
-def write_description(d, text, tier, keywords):
+def write_description(d, text, tier):
     # DISCLAIMER:
     # Keyword koden kommer att få dina ögon o blöda.
     fontsize = config.DESCRIPTION_FONTSIZE
@@ -96,7 +96,7 @@ def write_description(d, text, tier, keywords):
 
         # Write text word by word to allow keyword highlighting
         for i, word in enumerate(words):
-            if word.lower() in keywords:
+            if word.lower() in config.KEYWORDS:
                 word = word if word.isupper() else word.capitalize()
                 font = ImageFont.truetype(
                     'fonts/RobotoCondensed-Bold.ttf', fontsize)

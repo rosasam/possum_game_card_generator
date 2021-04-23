@@ -5,24 +5,25 @@ import pandas as pd
 
 from utils import config
 from utils.tiers import get_tier_name
-from utils.sheets_api import login, get_all
+from utils.google_api import get_sheets_data, download_drive_images
 from generator.cards import generate_card
 from generator.grid import generate_grid
 
 
 def main(args):
-    if len(args) > 1:
+    if not config.USE_GOOGLE_API:
+        if len(args) < 2:
+            print('Please provide card csv or enable Google API in config. Exiting...')
+            exit()
         filename = args[1]
         print(f'generating cards from csv:{filename}.')
         data = pd.read_csv(filename, keep_default_na=False, na_values=['NaN'])
     else:
-        login()
-        data = get_all()
+        data = get_sheets_data()
+
 
     skipped = []
     generated = 0
-
-    keywords = config.KEYWORDS
 
     # Create directories for each tier
     if not os.path.exists(config.CARD_SAVE_DIR):
@@ -36,6 +37,9 @@ def main(args):
 
     if not os.path.exists(config.PICTURE_SOURCE_DIR):
         os.makedirs(config.PICTURE_SOURCE_DIR)
+
+    if config.USE_GOOGLE_API:
+        download_drive_images(data)
 
     for i, row in data.iterrows():
         # Change these keys to match the keys in the csv
@@ -65,7 +69,7 @@ def main(args):
                     config.PICTURE_SOURCE_DIR, picture) if picture else None
                 print(f'Generating {cardname}')
                 generate_card(
-                    tier, name, description, flavour, picturepath, cardpath, keywords
+                    tier, name, description, flavour, picturepath, cardpath 
                 )
             generated += 1
         else:

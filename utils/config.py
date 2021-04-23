@@ -41,16 +41,6 @@ KEYWORDS = [
     'EGG',
 ]
 
-# Google sheets field name as value, don't change the keys!
-GOOGLE_SHEETS_FIELD_NAMES = {
-    'amount': 'Amount',
-    'tier': 'Tier',
-    'name': 'Name',
-    'description': 'Effect',
-    'flavour': 'Flavor text',
-    'picture': 'Picture'
-}
-
 # Directories
 CARD_SAVE_DIR = 'generated_cards'
 PICTURE_SOURCE_DIR = 'source_pictures'
@@ -65,6 +55,38 @@ MAX_CARDS = MAX_GRID_WIDTH * MAX_GRID_HEIGHT
 
 # WINDOWS
 FORBIDDEN_CHARACTERS = ['/', '\\', ':', '*', '?' '\'', '<', '>', '|']
+
+# -----------------
+# GOOGLE API CONFIG
+# -----------------
+
+# Only set to false if you can't get the API to work for some reason
+USE_GOOGLE_API = True
+
+# If modifying these scopes, delete the file token.pickle.
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',
+          'https://www.googleapis.com/auth/drive.readonly',
+          'https://www.googleapis.com/auth/drive.metadata.readonly'
+          ]
+
+DRIVE_SOURCE_IMAGE_DIR_ID = '1bk23hNSETw9zm8u1-3My8zY0IRJkFBrr'
+
+# 'All cards' spreadsheet ID
+SPREADSHEET_ID = '1yJsNpidAPBM8KogZp611Ebn-r0iaY9_1g5bkOW0XOM0'
+
+# Google sheets field name as value, don't change the keys!
+GOOGLE_SHEETS_FIELD_NAMES = {
+    'amount': 'Amount',
+    'tier': 'Tier',
+    'name': 'Name',
+    'description': 'Effect',
+    'flavour': 'Flavor text',
+    'picture': 'Picture'
+}
+
+TAB = 'All cards'
+RANGE = 'A1:F'
+RANGE_NAME = f"'{TAB}'!{RANGE}"
 
 # ---------------
 # TEMPLATE CONFIG
