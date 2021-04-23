@@ -2,3 +2,5 @@ generated_cards/
 __pycache__/
 *.csv
 .DS_Store
+venv/*
+*.pickle
