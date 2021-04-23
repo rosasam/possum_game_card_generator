@@ -1,9 +1,11 @@
 from __future__ import print_function
 import pickle
+import pandas as pd
 import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from . import config
 
 
 # If modifying these scopes, delete the file token.pickle.
@@ -13,7 +15,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 SPREADSHEET_ID = '1yJsNpidAPBM8KogZp611Ebn-r0iaY9_1g5bkOW0XOM0'
 
 TAB = 'All cards'
-RANGE = 'A2:F'
+RANGE = 'A1:F'
 RANGE_NAME = f"'{TAB}'!{RANGE}"
 
 
@@ -27,7 +29,7 @@ def login():
     # Define some paths relative to file location
     dir_path = os.path.dirname(os.path.realpath(__file__))
     token_path = os.path.join(dir_path, 'token.pickle')
-    credentials_path = os.path.join(dir_path, 'credentials.json')
+    credentials_path = os.path.join(dir_path, config.CREDENTIALS_PATH)
 
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -58,15 +60,15 @@ def get_all():
     # Call the Sheets API
     sheet = service.spreadsheets()
     result = sheet.values().get(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME).execute()
-    values = result.get('values', [])
+        spreadsheetId=SPREADSHEET_ID,
+        range=RANGE_NAME).execute()
 
-    if not values:
+    data = result.get('values', [])
+    if not data:
         raise RuntimeError('No data found.')
     else:
         # Values is an array where each row corresponds to a row in the sheets
-        return values
+        return pd.DataFrame(data[1:], columns=data[0])
 
 
 if __name__ == '__main__':

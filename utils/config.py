@@ -55,6 +55,7 @@ GOOGLE_SHEETS_FIELD_NAMES = {
 CARD_SAVE_DIR = 'generated_cards'
 PICTURE_SOURCE_DIR = 'source_pictures'
 TEMPLATES_DIR = 'templates'
+CREDENTIALS_PATH = 'credentials.json'
 
 # Card grid generation
 GENERATE_GRID = True

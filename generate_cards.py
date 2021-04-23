@@ -5,18 +5,20 @@ import pandas as pd
 
 from utils import config
 from utils.tiers import get_tier_name
+from utils.sheets_api import login, get_all
 from generator.cards import generate_card
 from generator.grid import generate_grid
 
 
 def main(args):
-    if len(args) < 2:
-        print('Please provide filename for the csv.')
-        exit()
+    if len(args) > 1:
+        filename = args[1]
+        print(f'generating cards from csv:{filename}.')
+        data = pd.read_csv(filename, keep_default_na=False, na_values=['NaN'])
+    else:
+        login()
+        data = get_all()
 
-    filename = args[1]
-    print(f'generating cards from csv:{filename}.')
-    data = pd.read_csv(filename, keep_default_na=False, na_values=['NaN'])
     skipped = []
     generated = 0
 
