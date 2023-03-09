@@ -6,38 +6,6 @@ from utils import config
 from utils.tiers import get_tier_name
 
 
-# Generates and saves a single card
-def generate_card(tier, name, description, flavour, picture_file_name,
-                  filename):
-    card = Image.new('RGBA',
-                     (config.CARD_WIDTH_PIXELS, config.CARD_HEIGHT_PIXELS))
-
-    add_background(card, 'bottom', tier)
-
-    if picture_file_name:
-        try:
-            picture_file_path = os.path.join(config.PICTURE_SOURCE_DIR,
-                                             picture_file_name)
-            add_picture(card, picture_file_path)
-        except Exception as e:
-            print(
-                f'\033[93mWARNING\033[0m: Picture file \"{picture_file_path}\" for card \"{name}\" could not be found.'
-            )
-    add_background(card, 'top', tier)
-
-    d = ImageDraw.Draw(card)
-    write_title(d, name, tier)
-
-    if description:
-        description_bottom_y = write_description(d, description, tier)
-    else:
-        description_bottom_y = 0
-    if flavour:
-        write_flavour(d, flavour, description_bottom_y, tier)
-
-    card.save(f'{filename}.png')
-
-
 def add_background(image, layer, tier):
     if layer == 'bottom':
         filename = 'card_template_bot.png'
