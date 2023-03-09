@@ -4,12 +4,12 @@ from utils import config
 
 class Card:
 
-    def __init__(self, name: str, tier: int, amount: int, picture_path: str,
-                 description: str, flavour: str):
+    def __init__(self, name: str, tier: int, amount: int,
+                 picture_file_name: str, description: str, flavour: str):
         self.name = name
         self.tier = tier
         self.amount = amount
-        self.picture_path = picture_path
+        self.picture_path = picture_file_name
         self.description = description
         self.flavour = flavour
 
