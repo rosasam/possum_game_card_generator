@@ -49,7 +49,7 @@ def main(args):
         name = str(row[field_names['name']])
         tier = int(row[field_names['tier']])
         amount = int(row[field_names['amount']])
-        picture = str(row[field_names['picture']])
+        picture = row[field_names['picture']]
         description = str(row[field_names['description']])
         flavour = str(row[field_names['flavour']])
 
