@@ -6,14 +6,18 @@ import pandas as pd
 from utils import config
 from utils.tiers import get_tier_name
 from utils.google_api import get_sheets_data, download_drive_images
+from generator.card_generator import Generator
 from generator.cards import generate_card
 from generator.grid import generate_grid
+from generator.card import Card
 
 
 def main(args):
     if not config.USE_GOOGLE_API:
         if len(args) < 2:
-            print('Please provide card csv or enable Google API in config. Exiting...')
+            print(
+                'Please provide card csv or enable Google API in config. Exiting...'
+            )
             exit()
         filename = args[1]
         print(f'generating cards from csv:{filename}.')
@@ -21,9 +25,7 @@ def main(args):
     else:
         data = get_sheets_data()
 
-
-    skipped = []
-    generated = 0
+    generator = Generator()
 
     # Create directories for each tier
     if not os.path.exists(config.CARD_SAVE_DIR):
@@ -44,45 +46,17 @@ def main(args):
     for i, row in data.iterrows():
         # Change these keys to match the keys in the csv
         field_names = config.GOOGLE_SHEETS_FIELD_NAMES
-        amount = row[field_names['amount']]
-        tier = row[field_names['tier']]
-        name = row[field_names['name']]
-        description = row[field_names['description']]
-        flavour = row[field_names['flavour']]
-        picture = row[field_names['picture']]
+        name = str(row[field_names['name']])
+        tier = int(row[field_names['tier']])
+        amount = int(row[field_names['amount']])
+        picture = str(row[field_names['picture']])
+        description = str(row[field_names['description']])
+        flavour = str(row[field_names['flavour']])
 
         if amount and name:
-            amount = int(amount)
-            tier = int(tier) if tier else ''
-            # Create tier directory if it doesn't exists
-            tier_path = os.path.join(config.CARD_SAVE_DIR, get_tier_name(tier))
-            if not os.path.exists(tier_path):
-                os.makedirs(tier_path)
-            # Generate 'amount' many cards
-            for i in range(1, amount + 1):
-                # Windows filenames can't contains some special characters.
-                cardname = f"{get_tier_name(tier)}_{name.lower().replace(' ', '_')}_{i}"
-                for c in config.FORBIDDEN_CHARACTERS:
-                    cardname = cardname.replace(c, '')
-                cardpath = os.path.join(tier_path, cardname)
-                picturepath = os.path.join(
-                    config.PICTURE_SOURCE_DIR, picture) if picture else None
-                print(f'Generating {cardname}')
-                generate_card(
-                    tier, name, description, flavour, picturepath, cardpath 
-                )
-            generated += 1
-        else:
-            print('--- WARNING ---')
-            print(
-                f'Invalid csv row ({i}): Amount and name must be set for all rows!')
-            print('---------------')
-            skipped.append(row)
-
-    print(f'Generated {generated} unique cards (duplicates not counted).')
-    print(f'Skipped {len(skipped)} rows:')
-    for row in skipped:
-        print(row)
+            generator.add_card(
+                Card(name, tier, amount, picture, description, flavour))
+    generator.generate_cards()
 
     if config.GENERATE_GRID:
         print('Generating grid')
