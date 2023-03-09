@@ -9,9 +9,10 @@ class Card:
         self.name = name
         self.tier = tier
         self.amount = amount
-        self.picture_path = picture_file_name
+        self.picture_file_name = picture_file_name
         self.description = description
         self.flavour = flavour
+        self.card_image_full_path = None
 
     def get_card_file_name(self):
         file_name = f"{get_tier_name(self.tier)}_{self.name.lower().replace(' ', '_')}"
