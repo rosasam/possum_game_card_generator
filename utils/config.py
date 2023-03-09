@@ -20,7 +20,7 @@ TIERS = {
         'color': (253, 241, 72),
     },
     10: {
-        'name': 'EGG',
+        'name': 'egg',
         'color': 'white',
     }
 }
