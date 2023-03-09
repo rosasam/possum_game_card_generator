@@ -48,7 +48,8 @@ TEMPLATES_DIR = 'templates'
 CREDENTIALS_PATH = 'credentials.json'
 
 # WINDOWS
-FORBIDDEN_CHARACTERS = ['/', '\\', ':', '*', '?' '\'', '<', '>', '|']
+FORBIDDEN_CHARACTERS = ['/', '\\', ':', '*', '?'
+                        '\'', '<', '>', '|']
 
 # -----------------
 # GOOGLE API CONFIG
@@ -58,10 +59,11 @@ FORBIDDEN_CHARACTERS = ['/', '\\', ':', '*', '?' '\'', '<', '>', '|']
 USE_GOOGLE_API = True
 
 # If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',
-          'https://www.googleapis.com/auth/drive.readonly',
-          'https://www.googleapis.com/auth/drive.metadata.readonly'
-          ]
+SCOPES = [
+    'https://www.googleapis.com/auth/spreadsheets.readonly',
+    'https://www.googleapis.com/auth/drive.readonly',
+    'https://www.googleapis.com/auth/drive.metadata.readonly'
+]
 
 DRIVE_SOURCE_IMAGE_DIR_ID = '1bk23hNSETw9zm8u1-3My8zY0IRJkFBrr'
 
