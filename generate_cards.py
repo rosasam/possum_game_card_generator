@@ -56,6 +56,9 @@ def main(args):
         if amount and name:
             generator.add_card(
                 Card(name, tier, amount, picture, description, flavour))
+        else:
+            print(
+                f'\033[93mWARNING\033[0m: CSV row {i} missing name or amount')
     generator.generate_cards()
 
     if config.GENERATE_GRID:
