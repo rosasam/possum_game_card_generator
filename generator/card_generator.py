@@ -24,12 +24,9 @@ class Generator:
             card_file_name = card.get_card_file_name()
             cardpath = os.path.join(tier_path, card_file_name)
 
-            picturepath = os.path.join(
-                config.PICTURE_SOURCE_DIR,
-                card.picture_path) if card.picture_path else None
             print(f'Generating {card_file_name}')
             generate_card(card.tier, card.name, card.description, card.flavour,
-                          picturepath, cardpath)
+                          card.picture_path, cardpath)
 
     def generate_grid(self):
         pass
