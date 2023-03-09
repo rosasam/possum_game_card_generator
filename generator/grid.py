@@ -24,7 +24,7 @@ def generate_grid():
             card_grid.save(os.path.join(config.CARD_SAVE_DIR, name))
 
     print(f'Generating PDF with all cards')
-    combine_cards(allCardPaths)[0].save(config.CARD_SAVE_DIR + "\\all_cards.pdf", "PDF" , resolution=100.0)
+    combine_cards(allCardPaths)[0].save(config.CARD_SAVE_DIR + "/all_cards.pdf", "PDF" , resolution=300.0)
 
 def combine_cards(cards):
     images = [Image.open(c) for c in cards]
@@ -32,11 +32,11 @@ def combine_cards(cards):
     # Calculate final grid size
     nof_rows = math.ceil(len(images) / config.MAX_GRID_WIDTH)
     if len(images) > config.MAX_GRID_WIDTH:
-        grid_size = (config.MAX_GRID_WIDTH * config.WIDTH,
-                     nof_rows * config.HEIGHT)
+        grid_size = (config.MAX_GRID_WIDTH * config.CARD_WIDTH_PIXELS,
+                     nof_rows * config.CARD_HEIGHT_PIXELS)
     else:
         # Add an extra row to grids with only one row, required by Tabletop Simulator
-        grid_size = (config.WIDTH * len(images), config.HEIGHT * 2)
+        grid_size = (config.CARD_WIDTH_PIXELS * len(images), config.CARD_HEIGHT_PIXELS * 2)
     card_grid = Image.new('RGB', grid_size)
 
     # Process batches of MAX_GRID_WIDTH
