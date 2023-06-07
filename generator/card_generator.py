@@ -73,23 +73,40 @@ class Generator:
         pdf = FPDF(orientation="landscape", format="A4", unit='mm')
         all_card_paths = self.get_all_card_image_file_paths()
         cards_per_page = config.MAX_GRID_WIDTH * config.MAX_GRID_HEIGHT
-        nof_pages_needed = math.ceil(len(all_card_paths) / cards_per_page)
+        total_card_amount = len(all_card_paths)
+        nof_pages_needed = math.ceil(total_card_amount / cards_per_page)
         for page_number in range(nof_pages_needed):
             pdf.add_page()
+            card_amount_on_page = total_card_amount - page_number * cards_per_page
             for j in range(config.MAX_GRID_HEIGHT):
                 image_position_y = config.Y_PRINT_MARGIN_MM + j * config.CARD_HEIGHT_MM
                 for i in range(config.MAX_GRID_WIDTH):
                     # Stop if we've printed all cards
-                    index_of_image = page_number * cards_per_page + j * config.MAX_GRID_WIDTH + i
-                    if index_of_image > len(all_card_paths) - 1:
+                    if j * config.MAX_GRID_WIDTH + i >= card_amount_on_page:
                         break
 
                     image_position_x = config.X_PRINT_MARGIN_MM + i * config.CARD_WIDTH_MM
+                    index_of_image = page_number * cards_per_page + j * config.MAX_GRID_WIDTH + i
                     pdf.image(all_card_paths[index_of_image],
                               x=image_position_x,
                               y=image_position_y,
                               w=config.CARD_WIDTH_MM,
                               h=config.CARD_HEIGHT_MM)
+
+            self.generate_card_back_page(pdf, card_amount_on_page)
         pdf.output(
             os.path.join(config.CARD_SAVE_DIR,
                          config.GRID_PDF_OUTPUT_FILE_NAME))
+
+    def generate_card_back_page(self, pdf, card_amount_on_page):
+        # Add card back
+        pdf.add_page()
+        for j in range(config.MAX_GRID_HEIGHT):
+            image_position_y = config.Y_PRINT_MARGIN_MM + j * config.CARD_HEIGHT_MM
+            for i in range(config.MAX_GRID_WIDTH):
+                image_position_x = config.X_PRINT_MARGIN_MM + i * config.CARD_WIDTH_MM
+                pdf.image(config.CARD_BACK_IMAGE_FULL_PATH,
+                          x=image_position_x,
+                          y=image_position_y,
+                          w=config.CARD_WIDTH_MM,
+                          h=config.CARD_HEIGHT_MM)
