@@ -4,3 +4,4 @@ google-auth-oauthlib
 pandas
 Pillow
 tqdm
+fpdf
