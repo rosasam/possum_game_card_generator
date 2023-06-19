@@ -53,6 +53,7 @@ def main(args):
         # Change these keys to match the keys in the csv
         field_names = config.GOOGLE_SHEETS_FIELD_NAMES
         name = row[field_names['name']]
+        cost = int(row[field_names['cost']])
         tier = int(row[field_names['tier']])
         amount = int(row[field_names['amount']])
         picture_file_name = f"{name.lower().replace(' ', '_')}.jpg" # Same logic as in card.py
@@ -66,7 +67,7 @@ def main(args):
             continue
 
         generator.add_card(
-            Card(name, tier, amount, picture_file_name, description, flavour))
+            Card(name, cost, tier, amount, picture_file_name, description, flavour))
 
     # Generate output files
     generator.generate_cards()

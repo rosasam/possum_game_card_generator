@@ -1,7 +1,7 @@
 import os
 from utils import config
 from utils.tiers import get_tier_name
-from generator.cards import add_background, add_picture, write_description, write_flavour, write_title
+from generator.cards import add_background, add_picture, write_description, write_flavour, write_title, write_nut_cost
 from generator.card import Card
 from fpdf import FPDF
 from PIL import Image, ImageDraw
@@ -42,6 +42,7 @@ class Generator:
         add_background(card_image, 'top', card.tier)
 
         d = ImageDraw.Draw(card_image)
+        write_nut_cost(card_image, d, card.cost)
         write_title(d, card.name, card.tier)
 
         if card.description:

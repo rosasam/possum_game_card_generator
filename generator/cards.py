@@ -1,6 +1,6 @@
 import os
 import textwrap
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 from utils import config
 from utils.tiers import get_tier_name
@@ -103,3 +103,26 @@ def write_flavour(d, text, start_height, tier):
         width, height = font.getsize(line)
         d.text((config.TEXT_LEFT_MARGIN, y_text), line, fill=color, font=font)
         y_text += height
+
+
+def write_nut_cost(card_image, d, cost):
+    if not cost: # Dont draw 0 cost
+        return
+    cost = str(cost)
+    fontsize = 120
+    text_font = ImageFont.truetype('fonts/JustAnotherHand-Regular.ttf', fontsize)
+    text_width, text_height = text_font.getsize(cost)
+    text_position = ((config.CARD_WIDTH_PIXELS - text_width) // 2, 
+        config.COST_POSITION_Y + (50 - text_height) // 2)
+
+    drop_shadow_font = ImageFont.truetype('fonts/JustAnotherHand-Regular.ttf', fontsize + 20)
+    drop_shadow_width, drop_shadow_height = drop_shadow_font.getsize(cost)
+    drop_shadow_position = ((config.CARD_WIDTH_PIXELS - drop_shadow_width) // 2, 
+        config.COST_POSITION_Y + (50 - drop_shadow_height) // 2)
+    drop_shadow_image = Image.new('RGBA', (config.CARD_WIDTH_PIXELS, config.CARD_HEIGHT_PIXELS))
+    drop_shadow_draw = ImageDraw.Draw(drop_shadow_image)
+    drop_shadow_draw.text(xy=drop_shadow_position, text=cost, fill='black', font=drop_shadow_font)
+    drop_shadow_image = drop_shadow_image.filter(ImageFilter.BoxBlur(3))
+    card_image.paste(drop_shadow_image, drop_shadow_image)
+
+    d.text(text_position, cost, fill='white', font=text_font)
