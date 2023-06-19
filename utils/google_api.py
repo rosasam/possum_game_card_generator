@@ -98,9 +98,11 @@ def download_drive_images(data):
     downloaded_images = glob.glob(os.path.join(source_image_dir, '*.jpg'))
     downloaded_images = [os.path.basename(d) for d in downloaded_images]
     
-    # Images added to the spreadhsheet
+    # Images added to the spreadsheet
+    needed_card_images = [f"{name.lower().replace(' ', '_')}.jpg" for name in get_sheets_data()[config.GOOGLE_SHEETS_FIELD_NAMES['name']]]
+    needed_card_images.append('card_back.jpg')
     drive_images = get_drive_image_list()
-    missing_images = [img for img in drive_images if img['name'] not in downloaded_images]
+    missing_images = [img for img in drive_images if img['name'] not in downloaded_images and img['name'] in needed_card_images]
     if missing_images:
         print(f'Downloading {len(missing_images)} images from Drive...')
     for img in tqdm.tqdm(missing_images):
