@@ -39,6 +39,7 @@ KEYWORDS = [
     'Trash',
     'NUT!',
     'EGG',
+    'Pouch',
 ]
 
 # Directories
@@ -72,6 +73,7 @@ SPREADSHEET_ID = '1yJsNpidAPBM8KogZp611Ebn-r0iaY9_1g5bkOW0XOM0'
 
 # Google sheets field name as value, don't change the keys!
 GOOGLE_SHEETS_FIELD_NAMES = {
+    'cost': '$',
     'amount': 'Amount',
     'tier': 'Tier',
     'name': 'Name',
@@ -81,7 +83,7 @@ GOOGLE_SHEETS_FIELD_NAMES = {
 }
 
 TAB = 'All cards'
-RANGE = 'A1:F'
+RANGE = 'A1:G'
 RANGE_NAME = f"'{TAB}'!{RANGE}"
 
 # ---------------
