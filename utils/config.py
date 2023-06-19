@@ -78,8 +78,7 @@ GOOGLE_SHEETS_FIELD_NAMES = {
     'tier': 'Tier',
     'name': 'Name',
     'description': 'Effect',
-    'flavour': 'Flavor text',
-    'picture': 'Picture'
+    'flavour': 'Flavor text'
 }
 
 TAB = 'All cards'

@@ -55,7 +55,7 @@ def main(args):
         name = row[field_names['name']]
         tier = int(row[field_names['tier']])
         amount = int(row[field_names['amount']])
-        picture_file_name = row[field_names['picture']]
+        picture_file_name = f"{name.lower().replace(' ', '_')}.jpg" # Same logic as in card.py
         description = row[field_names['description']]
         flavour = row[field_names['flavour']]
 

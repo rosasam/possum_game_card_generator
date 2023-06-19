@@ -97,8 +97,8 @@ def download_drive_images(data):
     # Only download images that are not already downloaded (based on image urls in spreadsheet)
     downloaded_images = glob.glob(os.path.join(source_image_dir, '*.jpg'))
     downloaded_images = [os.path.basename(d) for d in downloaded_images]
+    
     # Images added to the spreadhsheet
-    spreadsheet_images = [img for img in data["Picture"] if img]
     drive_images = get_drive_image_list()
     missing_images = [img for img in drive_images if img['name'] not in downloaded_images]
     if missing_images:
