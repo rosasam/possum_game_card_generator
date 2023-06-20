@@ -24,50 +24,60 @@ def main(args):
         data = pd.read_csv(filename, keep_default_na=False, na_values=['NaN'])
 
     generator = Generator()
+    abs_path_to_this_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Create directories for each tier
-    if not os.path.exists(config.CARD_SAVE_DIR):
-        os.makedirs(config.CARD_SAVE_DIR)
+    abs_path_to_card_save_dir = os.path.join(abs_path_to_this_dir,
+                                             config.CARD_SAVE_DIR)
+    try:
+        os.makedirs(abs_path_to_card_save_dir)  # Throws OSError if it exists
+    except OSError:
+        pass
 
     # Delete all old cards
     print('Deleting old cards...')
-    for name, _, _ in os.walk(config.CARD_SAVE_DIR):
-        images = glob.glob(os.path.join(name, '*.png'))
-        for i in images:
-            os.remove(i)
-
-        pdfs = glob.glob(os.path.join(name, '*.pdf'))
-        for pdf in pdfs:
-            os.remove(pdf)
+    for name, _, _ in os.walk(abs_path_to_card_save_dir):
+        old_png_files = glob.glob(os.path.join(name, '*.png'))
+        old_jpg_files = glob.glob(os.path.join(name, '*.jpg'))
+        old_pdf_files = glob.glob(os.path.join(name, '*.pdf'))
+        old_files = old_png_files + old_jpg_files + old_pdf_files
+        for file in old_files:
+            os.remove(file)
 
     # Create source pictures directory
-    if not os.path.exists(config.PICTURE_SOURCE_DIR):
-        os.makedirs(config.PICTURE_SOURCE_DIR)
+    abs_path_to_picture_source_dir = os.path.join(abs_path_to_this_dir,
+                                                  config.PICTURE_SOURCE_DIR)
+    try:
+        os.makedirs(abs_path_to_picture_source_dir)
+    except OSError:
+        pass
 
     # Download source pictures
     if config.USE_GOOGLE_API:
         download_drive_images(data)
 
-    # Fetch and parse card data
-    for i, row in data.iterrows():
+    # Parse card data and create cards
+    for file, row in data.iterrows():
         # Change these keys to match the keys in the csv
         field_names = config.GOOGLE_SHEETS_FIELD_NAMES
         name = row[field_names['name']]
         cost = int(row[field_names['cost']])
         tier = int(row[field_names['tier']])
         amount = int(row[field_names['amount']])
-        picture_file_name = f"{name.lower().replace(' ', '_')}.jpg" # Same logic as in card.py
+        picture_file_name = f"{name.lower().replace(' ', '_')}.jpg"  # Same logic as in card.py
         description = row[field_names['description']]
         flavour = row[field_names['flavour']]
 
         # Dont generate card if either name or amount is defined
         if not name and amount:
             print(
-                f'\033[93mWARNING\033[0m: CSV row {i} missing name or amount')
+                f'\033[93mWARNING\033[0m: CSV row {file} missing name or amount'
+            )
             continue
 
         generator.add_card(
-            Card(name, cost, tier, amount, picture_file_name, description, flavour))
+            Card(name, cost, tier, amount, picture_file_name, description,
+                 flavour))
 
     # Generate output files
     generator.generate_cards()
