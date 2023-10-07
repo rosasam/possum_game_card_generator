@@ -1,7 +1,6 @@
 import os
 from utils import config
-from utils.tiers import get_tier_name
-from generator.cards import add_background, add_picture, write_description, write_flavour, write_title, write_nut_cost
+from generator.cards import add_layer, add_picture, write_description, write_flavour, write_title, write_nut_cost
 from generator.card import Card
 from fpdf import FPDF
 from PIL import Image, ImageDraw
@@ -28,7 +27,7 @@ class Generator:
         card_image = Image.new(
             'RGBA', (config.CARD_WIDTH_PIXELS, config.CARD_HEIGHT_PIXELS))
 
-        add_background(card_image, 'bottom', card.tier)
+        add_layer(card_image, 'bottom', card.type)
 
         if card.picture_file_name:
             try:
@@ -39,33 +38,26 @@ class Generator:
                 print(
                     f'\033[93mWARNING\033[0m: Picture file \"{picture_file_path}\" for card \"{card.name}\" could not be found.'
                 )
-        add_background(card_image, 'top', card.tier)
+        add_layer(card_image, 'top', card.type)
 
         d = ImageDraw.Draw(card_image)
         write_nut_cost(card_image, d, card.cost)
-        write_title(d, card.name, card.tier)
+        write_title(d, card.name)
 
         if card.description:
-            description_bottom_y = write_description(d, card.description,
-                                                     card.tier)
+            description_bottom_y = write_description(d, card.description)
         else:
             description_bottom_y = 0
         if card.flavour:
-            write_flavour(d, card.flavour, description_bottom_y, card.tier)
+            write_flavour(d, card.flavour, description_bottom_y)
 
         card_image.save(f'{full_output_path}.png')
         card.card_image_full_path = f'{full_output_path}.png'
 
     def generate_cards(self):
         for card in self.cards:
-            tier_path = os.path.join(config.CARD_SAVE_DIR,
-                                     get_tier_name(card.tier))
-            # Create tier directory if it doesn't exists
-            if not os.path.exists(tier_path):
-                os.makedirs(tier_path)
-
             card_file_name = card.get_card_file_name()
-            cardpath = os.path.join(tier_path, card_file_name)
+            cardpath = os.path.join(config.CARD_SAVE_DIR, card_file_name)
 
             print(f'Generating {card_file_name}')
             self.generate_card(card, cardpath)

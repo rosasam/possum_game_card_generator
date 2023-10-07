@@ -45,7 +45,7 @@ KEYWORDS = [
 # Directories
 CARD_SAVE_DIR = 'generated_cards'
 PICTURE_SOURCE_DIR = 'source_pictures'
-TEMPLATES_DIR = 'templates'
+TEMPLATES_DIR = 'templates/v2'
 CREDENTIALS_PATH = 'credentials.json'
 
 # WINDOWS
@@ -55,9 +55,6 @@ FORBIDDEN_CHARACTERS = ['/', '\\', ':', '*', '?'
 # -----------------
 # GOOGLE API CONFIG
 # -----------------
-
-# Only set to false if you can't get the API to work for some reason
-USE_GOOGLE_API = True
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [
@@ -75,11 +72,14 @@ SPREADSHEET_ID = '1yJsNpidAPBM8KogZp611Ebn-r0iaY9_1g5bkOW0XOM0'
 GOOGLE_SHEETS_FIELD_NAMES = {
     'cost': '$',
     'amount': 'Amount',
-    'tier': 'Tier',
+    'type': 'Type',
     'name': 'Name',
     'description': 'Effect',
     'flavour': 'Flavor text'
 }
+# Special card types. These should match the naming of their corresponding card image files
+# e.g. card_template_top_EGG
+CARD_TYPES = ['EGG', 'trap', 'lock']
 
 TAB = 'All cards'
 RANGE = 'A1:G'
@@ -103,6 +103,7 @@ PIC_Y_POSITION = 24
 
 # Text
 TEXT_LEFT_MARGIN = 50
+TITLE_FONT_FILE = 'THURSTON_erc_002.ttf'
 TITLE_FONTSIZE = 60
 TITLE_Y_POSITION = PIC_Y_POSITION + PIC_HEIGHT + 20
 COST_POSITION_Y = 45
