@@ -27,19 +27,13 @@ TIERS = {
 
 # Keywords in the description will be bolded
 KEYWORDS = [
-    'Take',
-    'Discard',
-    'Age',
     'Steal',
-    'Stash',
-    'Peek',
-    'Trap',
-    'Draw',
-    'Gain',
+    'Trap:',
     'Trash',
     'NUT!',
     'EGG',
-    'Pouch',
+    'Pouch:',
+    'Protect',
 ]
 
 # Directories
@@ -97,20 +91,31 @@ CARD_WIDTH_PIXELS = int(CARD_WIDTH_MM * PPMM)
 CARD_HEIGHT_PIXELS = int(CARD_HEIGHT_MM * PPMM)
 
 # Picture size
-PIC_WIDTH = 648
-PIC_HEIGHT = 570
-PIC_Y_POSITION = 24
+PIC_WIDTH = 615
+PIC_HEIGHT = 585 
+PIC_Y_POSITION = 34
 
-# Text
-TEXT_LEFT_MARGIN = 50
+# Title
 TITLE_FONT_FILE = 'THURSTON_erc_002.ttf'
-TITLE_FONTSIZE = 60
-TITLE_Y_POSITION = PIC_Y_POSITION + PIC_HEIGHT + 20
-COST_POSITION_Y = 45
-DESCRIPTION_FONTSIZE = 35
-CHARACTERS_PER_ROW = 42
-DESCRIPTION_Y_POSITION = TITLE_Y_POSITION + 100
-FLAVOUR_START_HEIGHT = CARD_HEIGHT_PIXELS - 300
+TITLE_FONTSIZE = 100
+TITLE_Y_POSITION = 586
+TITLE_MARGIN = 35
+BREAK_TAG = '<br>'
+BREAK_MIN_SIZE = 20
+
+COST_POSITION_Y = 45 # deprecated
+NUT_SPACING = 54
+
+DESCRIPTION_FONT_FILE = 'Onest-Light.ttf'
+DESCRIPTION_FONT_BOLD_FILE = 'Onest-SemiBold.ttf'
+DESCRIPTION_FONTSIZE = 32
+DESCRIPTION_LINE_HEIGHT = 36
+TEXT_MARGIN = 80
+CHARACTERS_PER_ROW = 34 # deprecated
+DESCRIPTION_Y_POSITION = 695
+DESCRIPTION_MAX_HEIGHT = 280
+
+FLAVOUR_START_HEIGHT = CARD_HEIGHT_PIXELS - 300 # deprecated
 
 # Card grid generation
 GENERATE_GRID = True
@@ -121,3 +126,4 @@ X_PRINT_MARGIN_MM = 3
 Y_PRINT_MARGIN_MM = 16
 GRID_PDF_OUTPUT_FILE_NAME = "all_cards.pdf"
 CARD_BACK_IMAGE_FULL_PATH = 'source_pictures/card_back.jpg'
+

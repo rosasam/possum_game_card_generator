@@ -1,16 +1,17 @@
 import os
 from utils import config
-from generator.cards import add_layer, add_picture, write_description, write_flavour, write_title, write_nut_cost
+from generator.cards import add_layer, add_picture, write_description, write_title, add_nuts, write_lock_modifier
 from generator.card import Card
 from fpdf import FPDF
 from PIL import Image, ImageDraw
 import math
-
+import re
 
 class Generator:
 
-    def __init__(self):
+    def __init__(self, testmode=False):
         self.cards = []
+        self.testmode = testmode
 
     def add_card(self, card: Card):
         self.cards.append(card)
@@ -41,18 +42,22 @@ class Generator:
         add_layer(card_image, 'top', card.type)
 
         d = ImageDraw.Draw(card_image)
-        write_nut_cost(card_image, d, card.cost)
+        #write_nut_cost(card_image, d, card.cost)
+        add_nuts(card_image, card.cost)
         write_title(d, card.name)
 
         if card.description:
-            description_bottom_y = write_description(d, card.description)
-        else:
-            description_bottom_y = 0
-        if card.flavour:
-            write_flavour(d, card.flavour, description_bottom_y)
+            write_description(d, card.description)
+
+        if card.type == 'lock':
+            lock_modifier = re.findall("Protect (\+[0-9])", card.description)
+            lock_modifier = lock_modifier[0] if len(lock_modifier) > 0 else '?'
+            write_lock_modifier(d, lock_modifier)
 
         card_image.save(f'{full_output_path}.png')
         card.card_image_full_path = f'{full_output_path}.png'
+        if self.testmode:
+            card_image.show()
 
     def generate_cards(self):
         for card in self.cards:

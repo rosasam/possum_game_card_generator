@@ -1,9 +1,10 @@
 import os
 import textwrap
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageFont
 
 from utils import config
-
+from generator.word import encode_words, text_wrap
+from utils.align import get_description_blocks_y_position
 
 def add_layer(image, layer, type):
     if layer == 'bottom':
@@ -31,91 +32,65 @@ def add_picture(img, path):
 
     # Crop the center of the image
     picture = picture.crop((left, top, right, bottom))
-
+ 
     img.paste(picture, ((config.CARD_WIDTH_PIXELS - config.PIC_WIDTH) // 2,
                         config.PIC_Y_POSITION), picture)
 
+def add_nuts(image, nuts: int):
+    if nuts < 1:
+        return
+    filename = f'card_template_NUT.png'
+    filepath = os.path.join(config.TEMPLATES_DIR, filename)
+    layerImage = Image.open(filepath).convert('RGBA').resize((config.CARD_WIDTH_PIXELS, config.CARD_HEIGHT_PIXELS))
+
+    for i in range(nuts):
+        offset = (nuts - 1) * config.NUT_SPACING // 2
+        x = config.NUT_SPACING * (nuts - i - 1) - offset
+        image.paste(layerImage, (x, 0), layerImage)
 
 def write_title(d, text):
     text = text.upper()
     fontsize = config.TITLE_FONTSIZE
     font = ImageFont.truetype(os.path.join('fonts', config.TITLE_FONT_FILE), fontsize)
     name_width, name_height = font.getsize(text)
-    while name_width > config.CARD_WIDTH_PIXELS - config.TEXT_LEFT_MARGIN:
+    while name_width > config.CARD_WIDTH_PIXELS - config.TITLE_MARGIN:
         fontsize -= 10
-        font = ImageFont.truetype('fonts/JustAnotherHand-Regular.ttf',
+        font = ImageFont.truetype(os.path.join('fonts', config.TITLE_FONT_FILE),
                                   fontsize)
         name_width, name_height = font.getsize(text)
     d.text(((config.CARD_WIDTH_PIXELS - name_width) // 2,
-            config.TITLE_Y_POSITION + (50 - name_height) // 2),
+            config.TITLE_Y_POSITION - name_height // 2),
            text,
            fill='black',
            font=font)
 
-
 def write_description(d, text):
-    fontsize = config.DESCRIPTION_FONTSIZE
-    lines = textwrap.wrap(text, width=config.CHARACTERS_PER_ROW)
-    y_text = config.DESCRIPTION_Y_POSITION
-    for line in lines:
-        words = line.replace(',', ' ,').replace('.', ' .').split(' ')
-        heights = []
-        x_word = config.TEXT_LEFT_MARGIN
+    words = encode_words(text.split(' '), config.KEYWORDS, config.DESCRIPTION_FONTSIZE)
+    blocks = text_wrap(words, config.CARD_WIDTH_PIXELS - config.TEXT_MARGIN * 2)
+    block_start_positions = get_description_blocks_y_position(blocks)
 
-        # Write text word by word to allow keyword highlighting
-        for i, word in enumerate(words):
-            if word.lower() in config.KEYWORDS:
-                word = word if word.isupper() else word.capitalize()
-                font = ImageFont.truetype('fonts/RobotoCondensed-Bold.ttf',
-                                          fontsize)
-            else:
-                font = ImageFont.truetype('fonts/RobotoCondensed-Regular.ttf',
-                                          fontsize)
+    y_position = 0
 
-            width, height = font.getsize(word)
-            heights.append(height)
-            d.text((x_word, y_text), word, fill='black', font=font)
+    for block, block_y_position in zip(blocks, block_start_positions):
+        y_position = block_y_position
+        for line in block:
+            linewidth = sum([w.length for w in line])
+            # This horizontally centers the text
+            x_position = int(config.CARD_WIDTH_PIXELS / 2 - linewidth / 2)
+            for word in line:
+                d.text((x_position, y_position), word.text, fill='black', font=word.font)
+                x_position += word.length
+            y_position += config.DESCRIPTION_LINE_HEIGHT
+        
+    return y_position
 
-            # Don't add whitespace if next character is a punctuation mark
-            if i + 1 < len(words) and words[i + 1] in ['.', ',']:
-                x_word += width
-            else:
-                x_word += width + 8
-        y_text += max(heights)
-    return y_text
+def draw_horizontal_line(d, y_position, width, color="#dcc9b0"):
+    x_start = (config.CARD_WIDTH_PIXELS - width) // 2 if width < config.CARD_WIDTH_PIXELS else config.CARD_WIDTH_PIXELS
+    x_end = config.CARD_WIDTH_PIXELS - x_start
+    shape = [(x_start, y_position), (x_end, y_position)]
+    d.line(shape, fill =color, width = 2) 
 
-
-def write_flavour(d, text, start_height):
-    fontsize = config.DESCRIPTION_FONTSIZE
-    font = ImageFont.truetype('fonts/RobotoCondensed-Italic.ttf', fontsize)
-
-    lines = textwrap.wrap(text, width=config.CHARACTERS_PER_ROW + 4)
-    y_text = config.FLAVOUR_START_HEIGHT if config.FLAVOUR_START_HEIGHT > start_height + \
-        60 else start_height + 60
-    for line in lines:
-        width, height = font.getsize(line)
-        d.text((config.TEXT_LEFT_MARGIN, y_text), line, fill='black', font=font)
-        y_text += height
-
-
-def write_nut_cost(card_image, d, cost):
-    if not cost: # Dont draw 0 cost
-        return
-    cost = str(cost)
-    fontsize = 120
-    text_font = ImageFont.truetype('fonts/JustAnotherHand-Regular.ttf', fontsize)
-    text_width, text_height = text_font.getsize(cost)
-    text_position = ((config.CARD_WIDTH_PIXELS - text_width) // 2, 
-        config.COST_POSITION_Y + (50 - text_height) // 2)
-
-    drop_shadow_font = ImageFont.truetype('fonts/JustAnotherHand-Regular.ttf', fontsize + 20)
-    drop_shadow_width, drop_shadow_height = drop_shadow_font.getsize(cost)
-    drop_shadow_position = ((config.CARD_WIDTH_PIXELS - drop_shadow_width) // 2, 
-        config.COST_POSITION_Y + (50 - drop_shadow_height) // 2)
-    drop_shadow_image = Image.new('RGBA', (config.CARD_WIDTH_PIXELS, config.CARD_HEIGHT_PIXELS))
-    drop_shadow_draw = ImageDraw.Draw(drop_shadow_image)
-    drop_shadow_draw.text(xy=drop_shadow_position, text=cost, fill='black', font=drop_shadow_font)
-    drop_shadow_image = drop_shadow_image.filter(ImageFilter.BoxBlur(3))
-    card_image.paste(drop_shadow_image, drop_shadow_image)
-
-    d.text(text_position, cost, fill='white', font=text_font)
+def write_lock_modifier(d, modifier: str):
+    font = ImageFont.truetype(os.path.join('fonts', config.TITLE_FONT_FILE), 140)
+    width, height = font.getsize(modifier)
+    d.text((65 - width // 2, 95 - height // 2), modifier, fill='#4d4d4d', font=font)

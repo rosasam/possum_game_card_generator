@@ -12,7 +12,8 @@ def main(args):
     # Get data from Google Drive if set in config. Otherwise, get data from a csv provided
     data = get_sheets_data()
     # Test mode only prints one card
-    test_mode = len(args) > 1 and args[1] == 'test'
+    testmode = len(args) > 1 and args[1] == 'test'
+    generator = Generator(testmode)
 
     abs_path_to_this_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -45,8 +46,6 @@ def main(args):
     # Download source pictures
     download_drive_images(data)
 
-    generator = Generator()
-
     # Parse card data and create cards
     for file, row in data.iterrows():
         # Change these keys to match the keys in the csv
@@ -71,8 +70,7 @@ def main(args):
         generator.add_card(
             Card(name, cost, cardType, amount, picture_file_name, description,
                  flavour))
-
-        if (test_mode):
+        if testmode:
             break
 
     # Generate output files
