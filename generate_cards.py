@@ -59,7 +59,6 @@ def main(args):
         flavour = row[field_names['flavour']]
 
         cardType = cardType if (cardType is not None and cardType != '') else 'default'
-        print('Type: ' + cardType)
         # Dont generate card if either name or amount is undefined
         if not name and amount:
             print(
