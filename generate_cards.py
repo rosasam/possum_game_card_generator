@@ -6,14 +6,16 @@ from utils import config
 from utils.google_api import get_sheets_data, download_drive_images
 from generator.card_generator import Generator
 from generator.card import Card
+from utils.types import get_card_type
 
 
 def main(args):
     # Get data from Google Drive if set in config. Otherwise, get data from a csv provided
     data = get_sheets_data()
     # Test mode only prints one card
-    testmode = len(args) > 1 and args[1] == 'test'
-    generator = Generator(testmode)
+    testmode = len(args) > 1 and ('--test' in args or '-t' in args)
+    no_cardback_mode = len(args) > 1 and ('--no-cardback' in args or '-nc' in args)
+    generator = Generator({ "testmode": testmode, "no_cardback_mode": no_cardback_mode })
 
     abs_path_to_this_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -58,7 +60,7 @@ def main(args):
         description = row[field_names['description']]
         flavour = row[field_names['flavour']]
 
-        cardType = cardType if (cardType is not None and cardType != '') else 'default'
+        cardType = get_card_type(cardType)
         # Dont generate card if either name or amount is undefined
         if not name and amount:
             print(

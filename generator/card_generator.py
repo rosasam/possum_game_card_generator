@@ -9,9 +9,10 @@ import re
 
 class Generator:
 
-    def __init__(self, testmode=False):
+    def __init__(self, options):
         self.cards = []
-        self.testmode = testmode
+        self.testmode = options['testmode'] if 'testmode' in options else False
+        self.no_cardback_mode = options['no_cardback_mode'] if 'no_cardback_mode' in options else False
 
     def add_card(self, card: Card):
         self.cards.append(card)
@@ -90,8 +91,8 @@ class Generator:
                               y=image_position_y,
                               w=config.CARD_WIDTH_MM,
                               h=config.CARD_HEIGHT_MM)
-
-            self.generate_card_back_page(pdf, card_amount_on_page)
+            if not self.no_cardback_mode:
+                self.generate_card_back_page(pdf, card_amount_on_page)
         pdf.output(
             os.path.join(config.CARD_SAVE_DIR,
                          config.GRID_PDF_OUTPUT_FILE_NAME))
