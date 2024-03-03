@@ -1,6 +1,6 @@
 import os
 from utils import config
-from generator.cards import add_layer, add_picture, write_description, write_title, add_nuts, write_lock_modifier
+from generator.cards import add_layer, add_icon, add_picture, write_description, write_title, write_nut_cost, write_card_type
 from generator.card import Card
 from fpdf import FPDF
 from PIL import Image, ImageDraw
@@ -29,7 +29,7 @@ class Generator:
         card_image = Image.new(
             'RGBA', (config.CARD_WIDTH_PIXELS, config.CARD_HEIGHT_PIXELS))
 
-        add_layer(card_image, 'bottom', card.type)
+        add_layer(card_image, 'bottom', card)
 
         if card.picture_file_name:
             try:
@@ -40,20 +40,19 @@ class Generator:
                 print(
                     f'\033[93mWARNING\033[0m: Picture file \"{picture_file_path}\" for card \"{card.name}\" could not be found.'
                 )
-        add_layer(card_image, 'top', card.type)
+        add_layer(card_image, 'top', card)
 
         d = ImageDraw.Draw(card_image)
-        #write_nut_cost(card_image, d, card.cost)
-        add_nuts(card_image, card.cost)
+        write_nut_cost(card_image, d, card.cost)
+        #add_nuts(card_image, card.cost)
         write_title(d, card.name)
+        write_card_type(d, card)
 
         if card.description:
             write_description(d, card.description)
 
-        if card.type == 'lock':
-            lock_modifier = re.findall("Protect (\+[0-9])", card.description)
-            lock_modifier = lock_modifier[0] if len(lock_modifier) > 0 else '?'
-            write_lock_modifier(d, lock_modifier)
+        if card.type in config.CARD_TYPES_WITH_ICONS:
+            add_icon(card_image, card.type)
 
         card_image.save(f'{full_output_path}.png')
         card.card_image_full_path = f'{full_output_path}.png'

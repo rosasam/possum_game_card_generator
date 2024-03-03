@@ -6,11 +6,11 @@ from utils import config
 from generator.word import encode_words, text_wrap
 from utils.align import get_description_blocks_y_position
 
-def add_layer(image, layer, type):
+def add_layer(image, layer, card):
     if layer == 'bottom':
         filename = 'card_template_bot.png'
     elif layer == 'top':
-        filename = f'card_template_top_{type}.png'
+        filename = f"card_template_top_{card.type}{'' if card.cost > 0 else '_base'}.png"
     layerImage = Image.open(os.path.join(config.TEMPLATES_DIR,
                                          filename)).convert('RGBA').resize(
                                              (config.CARD_WIDTH_PIXELS,
@@ -36,6 +36,14 @@ def add_picture(img, path):
     img.paste(picture, ((config.CARD_WIDTH_PIXELS - config.PIC_WIDTH) // 2,
                         config.PIC_Y_POSITION), picture)
 
+def add_icon(image, type):
+    filename = f'{type}-large.png'
+    filepath = os.path.join(config.ICONS_DIR, filename)
+    layerImage = Image.open(filepath).convert('RGBA').resize((config.ICON_LARGE_SIZE_PIXELS, config.ICON_LARGE_SIZE_PIXELS))
+
+    image.paste(layerImage, (config.CARD_TYPE_ICON_X, config.CARD_TYPE_ICON_Y), layerImage)
+
+# Deprecated
 def add_nuts(image, nuts: int):
     if nuts < 1:
         return
@@ -48,13 +56,26 @@ def add_nuts(image, nuts: int):
         x = config.NUT_SPACING * (nuts - i - 1) - offset
         image.paste(layerImage, (x, 0), layerImage)
 
+def write_nut_cost(image, d, cost: int):
+    if cost < 1:
+        return
+    fontsize = config.COST_FONT_SIZE
+    font = ImageFont.truetype(os.path.join('fonts', config.COST_FONT_FILE), fontsize)
+    text = str(cost)
+    cost_width, cost_height = font.getsize(text)
+    d.text((config.COST_X_POSITION - (cost_width // 2),
+            config.COST_Y_POSITION - cost_height // 2),
+           text,
+           fill='black',
+           font=font) 
+
 def write_title(d, text):
     text = text.upper()
     fontsize = config.TITLE_FONTSIZE
     font = ImageFont.truetype(os.path.join('fonts', config.TITLE_FONT_FILE), fontsize)
     name_width, name_height = font.getsize(text)
-    while name_width > config.CARD_WIDTH_PIXELS - config.TITLE_MARGIN:
-        fontsize -= 10
+    while name_width > config.CARD_WIDTH_PIXELS - config.TITLE_MARGIN * 2:
+        fontsize -= 2
         font = ImageFont.truetype(os.path.join('fonts', config.TITLE_FONT_FILE),
                                   fontsize)
         name_width, name_height = font.getsize(text)
@@ -84,12 +105,24 @@ def write_description(d, text):
         
     return y_position
 
+def write_card_type(d, card):
+    type = card.type.upper()
+    base = card.cost < 0
+    if card.type == 'event':
+        return
+    font = ImageFont.truetype(os.path.join('fonts', config.CARD_TYPE_TEXT_FONT), config.CARD_TYPE_TEXT_FONT_SIZE)
+    width, _ = font.getsize(type)
+    x_pos = config.CARD_TYPE_TEXT_X_POSITION - (width // 2)
+    d.text((x_pos, config.CARD_TYPE_TEXT_Y_POSITION), type, fill='black', font=font)
+
+
 def draw_horizontal_line(d, y_position, width, color="#dcc9b0"):
     x_start = (config.CARD_WIDTH_PIXELS - width) // 2 if width < config.CARD_WIDTH_PIXELS else config.CARD_WIDTH_PIXELS
     x_end = config.CARD_WIDTH_PIXELS - x_start
     shape = [(x_start, y_position), (x_end, y_position)]
     d.line(shape, fill =color, width = 2) 
 
+# Deprecated
 def write_lock_modifier(d, modifier: str):
     font = ImageFont.truetype(os.path.join('fonts', config.TITLE_FONT_FILE), 140)
     width, height = font.getsize(modifier)
