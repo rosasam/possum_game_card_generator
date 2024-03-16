@@ -12,16 +12,17 @@ class Word:
         self.space_after = space_after
         self.length = self.font.getsize(text)[0] + space_after
     
-# Splits words into lines, and lines into blocks (based on break tag)
+    
+# Splits words into lines, and lines into paragraphs (based on break tag)
 def text_wrap(words, max_width: int):
-    blocks = []
+    paragraphs = []
     lines = []
     current_line = words[0:1]
     for word in words[1:]:
         if word.text == config.BREAK_TAG:
             lines.append(current_line)
-            blocks.append(lines)
-            lines = []
+            #paragraphs.append(lines)
+            #lines = []
             current_line = []
         elif sum([w.length for w in current_line]) + word.length < max_width:
             current_line.append(word)
@@ -29,13 +30,15 @@ def text_wrap(words, max_width: int):
             lines.append(current_line)
             current_line = [word]
     lines.append(current_line)
-    blocks.append(lines)
+    paragraphs.append(lines)
 
-    return blocks
+    return paragraphs
 
 # Words can have punctuation marks at the end
  # assign properties to words: bold, line break, space after, etc. join non-breaking words together
-def encode_words(words, keywords, fontsize):
+def encode_text(text, fontsize=config.DESCRIPTION_FONTSIZE):
+    keywords = config.KEYWORDS
+    words = text.split(' ')
     keywords_lower = [k.lower() for k in keywords]
     encoded_words = []
     # Increase font size for cards with very little text.
@@ -46,5 +49,18 @@ def encode_words(words, keywords, fontsize):
         encoded_words.append(Word(word, style, 8, fontsize))
     return encoded_words
 
-
+def write_text(d, paragraphs, x, y, width, center=True, line_height=config.DESCRIPTION_LINE_HEIGHT):
+    y_position = y
+    for lines in paragraphs:
+        for line in lines:
+            linewidth = sum([w.length for w in line])
+            x_position = x
+            if center:
+                x_position = int(x + width / 2 - linewidth / 2)
+            for word in line:
+                d.text((x_position, y_position), word.text, fill='black', font=word.font)
+                x_position += word.length
+            y_position += line_height
+        y_position += config.BREAK_MIN_SIZE
+    return y_position
         

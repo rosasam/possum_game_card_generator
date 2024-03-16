@@ -1,10 +1,9 @@
 import os
-import textwrap
 from PIL import Image, ImageFont
+from generator.description_block import create_blocks
 
 from utils import config
-from generator.word import encode_words, text_wrap
-from utils.align import get_description_blocks_y_position
+from utils.align import get_description_blocks_y_position, get_description_width
 
 def add_layer(image, layer, card):
     if layer == 'bottom':
@@ -36,10 +35,10 @@ def add_picture(img, path):
     img.paste(picture, ((config.CARD_WIDTH_PIXELS - config.PIC_WIDTH) // 2,
                         config.PIC_Y_POSITION), picture)
 
-def add_icon(image, type):
+def add_card_type_icon(image, type):
     filename = f'{type}-large.png'
     filepath = os.path.join(config.ICONS_DIR, filename)
-    layerImage = Image.open(filepath).convert('RGBA').resize((config.ICON_LARGE_SIZE_PIXELS, config.ICON_LARGE_SIZE_PIXELS))
+    layerImage = Image.open(filepath).convert('RGBA').resize((config.CARD_TYPE_ICON_SIZE_PIXELS, config.CARD_TYPE_ICON_SIZE_PIXELS))
 
     image.paste(layerImage, (config.CARD_TYPE_ICON_X, config.CARD_TYPE_ICON_Y), layerImage)
 
@@ -47,7 +46,7 @@ def add_icon(image, type):
 def add_nuts(image, nuts: int):
     if nuts < 1:
         return
-    filename = f'card_template_NUT.png'
+    filename = 'card_template_NUT.png'
     filepath = os.path.join(config.TEMPLATES_DIR, filename)
     layerImage = Image.open(filepath).convert('RGBA').resize((config.CARD_WIDTH_PIXELS, config.CARD_HEIGHT_PIXELS))
 
@@ -56,7 +55,7 @@ def add_nuts(image, nuts: int):
         x = config.NUT_SPACING * (nuts - i - 1) - offset
         image.paste(layerImage, (x, 0), layerImage)
 
-def write_nut_cost(image, d, cost: int):
+def write_nut_cost(d, cost: int):
     if cost < 1:
         return
     fontsize = config.COST_FONT_SIZE
@@ -85,25 +84,14 @@ def write_title(d, text):
            fill='black',
            font=font)
 
-def write_description(d, text):
-    words = encode_words(text.split(' '), config.KEYWORDS, config.DESCRIPTION_FONTSIZE)
-    blocks = text_wrap(words, config.CARD_WIDTH_PIXELS - config.TEXT_MARGIN * 2)
+def write_description(image, d, text):
+    blocks = create_blocks(text)
     block_start_positions = get_description_blocks_y_position(blocks)
 
-    y_position = 0
-
     for block, block_y_position in zip(blocks, block_start_positions):
-        y_position = block_y_position
-        for line in block:
-            linewidth = sum([w.length for w in line])
-            # This horizontally centers the text
-            x_position = int(config.CARD_WIDTH_PIXELS / 2 - linewidth / 2)
-            for word in line:
-                d.text((x_position, y_position), word.text, fill='black', font=word.font)
-                x_position += word.length
-            y_position += config.DESCRIPTION_LINE_HEIGHT
-        
-    return y_position
+        block.render(image, d, block_y_position) 
+    return block_start_positions[-1] + blocks[-1].height if len(blocks) > 0 else config.DESCRIPTION_Y_POSITION
+
 
 def write_card_type(d, card):
     type = card.type.upper()
@@ -115,12 +103,6 @@ def write_card_type(d, card):
     x_pos = config.CARD_TYPE_TEXT_X_POSITION - (width // 2)
     d.text((x_pos, config.CARD_TYPE_TEXT_Y_POSITION), type, fill='black', font=font)
 
-
-def draw_horizontal_line(d, y_position, width, color="#dcc9b0"):
-    x_start = (config.CARD_WIDTH_PIXELS - width) // 2 if width < config.CARD_WIDTH_PIXELS else config.CARD_WIDTH_PIXELS
-    x_end = config.CARD_WIDTH_PIXELS - x_start
-    shape = [(x_start, y_position), (x_end, y_position)]
-    d.line(shape, fill =color, width = 2) 
 
 # Deprecated
 def write_lock_modifier(d, modifier: str):

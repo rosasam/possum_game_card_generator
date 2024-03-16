@@ -1,6 +1,6 @@
 import os
 from utils import config
-from generator.cards import add_layer, add_icon, add_picture, write_description, write_title, write_nut_cost, write_card_type
+from generator.cards import add_layer, add_card_type_icon, add_picture, write_description, write_title, write_nut_cost, write_card_type
 from generator.card import Card
 from fpdf import FPDF
 from PIL import Image, ImageDraw
@@ -43,16 +43,16 @@ class Generator:
         add_layer(card_image, 'top', card)
 
         d = ImageDraw.Draw(card_image)
-        write_nut_cost(card_image, d, card.cost)
+        write_nut_cost(d, card.cost)
         #add_nuts(card_image, card.cost)
         write_title(d, card.name)
         write_card_type(d, card)
 
         if card.description:
-            write_description(d, card.description)
+            write_description(card_image, d, card.description)
 
         if card.type in config.CARD_TYPES_WITH_ICONS:
-            add_icon(card_image, card.type)
+            add_card_type_icon(card_image, card.type)
 
         card_image.save(f'{full_output_path}.png')
         card.card_image_full_path = f'{full_output_path}.png'

@@ -28,12 +28,27 @@ TIERS = {
 # Keywords in the description will be bolded
 KEYWORDS = [
     'Steal',
+    'Steals'
     'Trap:',
+    'Trap',
     'Trash',
     'NUT!',
+    'NUT',
+    'NUTs',
     'EGG',
+    'EGGs'
     'Pouch:',
-    'Protect',
+    'Pouch',
+    'Lock',
+]
+# Tags will be replaced with icons
+# Write the name of the tag without any tag symbols, e.g. for <steal></steal> tags, write "steal"
+TAGS = [
+    'steal',
+    'trap',
+    'pouch',
+    'nut',
+    'lock',
 ]
 
 # Directories
@@ -74,7 +89,7 @@ GOOGLE_SHEETS_FIELD_NAMES = {
 }
 # Special card types. These should match the naming of their corresponding card image files
 # e.g. card_template_top_EGG
-CARD_TYPES = ['EGG', 'trap', 'lock', 'steal', 'NUT']
+CARD_TYPES = ['EGG', 'trap', 'lock', 'steal']
 CARD_TYPES_WITH_ICONS = ['EGG', 'trap', 'lock']
 
 TAB = 'All cards'
@@ -98,9 +113,14 @@ PIC_HEIGHT = 585
 PIC_Y_POSITION = 133
 
 # Icons
-ICON_LARGE_SIZE_PIXELS = 90
+CARD_TYPE_ICON_SIZE_PIXELS = 90
 CARD_TYPE_ICON_X = 30
 CARD_TYPE_ICON_Y = 35
+
+ICON_LARGE_SIZE_PIXELS = 105
+ICON_LARGE_FONT = 'Mali-Bold.ttf'
+ICON_LARGE_FONT_SIZE = 90
+ICON_GUTTER = 20
 
 # Title
 TITLE_FONT_FILE = 'THURSTON_erc_002.ttf'
@@ -108,7 +128,7 @@ TITLE_FONTSIZE = 80
 TITLE_Y_POSITION = 70
 TITLE_MARGIN = 150
 BREAK_TAG = '<br>'
-BREAK_MIN_SIZE = 20
+BREAK_MIN_SIZE = 20 # Paragraph break
 
 # COST
 COST_X_POSITION = 605
@@ -128,10 +148,12 @@ DESCRIPTION_FONT_FILE = 'RobotoCondensed-Regular.ttf'
 DESCRIPTION_FONT_BOLD_FILE = 'RobotoCondensed-Bold.ttf'
 DESCRIPTION_FONTSIZE = 42
 DESCRIPTION_LINE_HEIGHT = 46
+DESCRIPTION_PARAGRAPH_BREAK_SIZE = 12
 TEXT_MARGIN = 80
 CHARACTERS_PER_ROW = 34 # deprecated
-DESCRIPTION_Y_POSITION = 655
-DESCRIPTION_MAX_HEIGHT = 280
+DESCRIPTION_Y_POSITION = 635
+DESCRIPTION_MAX_HEIGHT = 320
+BLOCK_VERTICAL_PADDING = 10
 
 FLAVOUR_START_HEIGHT = CARD_HEIGHT_PIXELS - 300 # deprecated
 
