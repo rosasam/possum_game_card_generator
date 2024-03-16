@@ -1,11 +1,10 @@
 import os
 from utils import config
-from generator.cards import add_layer, add_card_type_icon, add_picture, write_description, write_title, write_nut_cost, write_card_type
+from generator.cards import add_layer, add_card_type_icon, add_picture, write_description, write_event_description, write_event_title, write_title, write_nut_cost, write_card_type
 from generator.card import Card
 from fpdf import FPDF
 from PIL import Image, ImageDraw
 import math
-import re
 
 class Generator:
 
@@ -35,7 +34,10 @@ class Generator:
             try:
                 picture_file_path = os.path.join(config.PICTURE_SOURCE_DIR,
                                                  card.picture_file_name)
-                add_picture(card_image, picture_file_path)
+                if card.type in config.EVENT_CARD_TYPES:
+                    add_picture(card_image, picture_file_path, config.CARD_HEIGHT_PIXELS, config.CARD_WIDTH_PIXELS)
+                else:
+                    add_picture(card_image, picture_file_path)
             except Exception as e:
                 print(
                     f'\033[93mWARNING\033[0m: Picture file \"{picture_file_path}\" for card \"{card.name}\" could not be found.'
@@ -43,16 +45,21 @@ class Generator:
         add_layer(card_image, 'top', card)
 
         d = ImageDraw.Draw(card_image)
-        write_nut_cost(d, card.cost)
-        #add_nuts(card_image, card.cost)
-        write_title(d, card.name)
-        write_card_type(d, card)
+        if card.type in config.EVENT_CARD_TYPES:
+            print('hehe')
+            write_event_title(card_image, card.name)
+            write_event_description(card_image, card.description)
+        else:
+            write_nut_cost(d, card.cost)
+            #add_nuts(card_image, card.cost)
+            write_title(d, card.name)
+            write_card_type(d, card)
 
-        if card.description:
-            write_description(card_image, d, card.description)
+            if card.description:
+                write_description(card_image, d, card.description)
 
-        if card.type in config.CARD_TYPES_WITH_ICONS:
-            add_card_type_icon(card_image, card.type)
+            if card.type in config.CARD_TYPES_WITH_ICONS:
+                add_card_type_icon(card_image, card.type)
 
         card_image.save(f'{full_output_path}.png')
         card.card_image_full_path = f'{full_output_path}.png'

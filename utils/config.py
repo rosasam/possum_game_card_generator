@@ -89,7 +89,9 @@ GOOGLE_SHEETS_FIELD_NAMES = {
 }
 # Special card types. These should match the naming of their corresponding card image files
 # e.g. card_template_top_EGG
-CARD_TYPES = ['EGG', 'trap', 'lock', 'steal']
+EVENT_CARD_TYPES = ['eggvent', 'raid']
+CARD_TYPES = ['EGG', 'trap', 'lock', 'steal', 'NUT'] + EVENT_CARD_TYPES
+
 CARD_TYPES_WITH_ICONS = ['EGG', 'trap', 'lock']
 
 TAB = 'All cards'
@@ -156,6 +158,11 @@ DESCRIPTION_MAX_HEIGHT = 320
 BLOCK_VERTICAL_PADDING = 10
 
 FLAVOUR_START_HEIGHT = CARD_HEIGHT_PIXELS - 300 # deprecated
+
+# EVENT
+EVENT_TITLE_FONTSIZE = 180
+EVENT_TITLE_Y = 318
+EVENT_DESCRIPTION_Y = 440
 
 # Card grid generation
 GENERATE_GRID = True

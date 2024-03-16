@@ -14,6 +14,7 @@ def main(args):
     data = get_sheets_data()
     # Test mode only prints one card
     testmode = len(args) > 1 and ('--test' in args or '-t' in args)
+    single_card_mode = len(args) > 1 and ('--single' in args or '-s' in args) 
     no_cardback_mode = len(args) > 1 and ('--no-cardback' in args or '-nc' in args)
     generator = Generator({ "testmode": testmode, "no_cardback_mode": no_cardback_mode })
 
@@ -68,6 +69,7 @@ def main(args):
             )
             continue
 
+        amount = 1 if single_card_mode else amount
         generator.add_card(
             Card(name, cost, cardType, amount, picture_file_name, description,
                  flavour))

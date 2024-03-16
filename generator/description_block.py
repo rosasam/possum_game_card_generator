@@ -1,6 +1,6 @@
 from generator.line import draw_horizontal_line
 from generator.icon import draw_icon, render_tags
-from generator.word import encode_text, text_wrap, write_text
+from generator.word import cap_text_to_max_height, encode_text, text_wrap, write_text
 from utils import config
 from utils.align import get_description_width, get_paragraphs_height
 import re
@@ -110,17 +110,3 @@ def create_blocks(text: str) -> list[DescriptionBlock]:
 
 def remove_tag_from_text(text: str, tag_pos: tuple[int, int]):
     return text[0:tag_pos[0]] + text[tag_pos[1]:len(text)]
-
-def cap_text_to_max_height(text: str, max_height: int, text_width: int):
-    total_height = 10000000
-    line_height = config.DESCRIPTION_LINE_HEIGHT
-    font_size = config.DESCRIPTION_FONTSIZE
-    paragraphs = []
-    while total_height > max_height:
-        words = encode_text(text, font_size)
-        paragraphs = text_wrap(words, text_width)
-        total_height = len(paragraphs[0]) * line_height
-        if total_height > max_height:
-            line_height = int(line_height / 1.1)
-            font_size = int(font_size / 1.1)
-    return paragraphs, line_height

@@ -1,6 +1,7 @@
 import os
-from PIL import Image, ImageFont
+from PIL import Image, ImageFont, ImageDraw
 from generator.description_block import create_blocks
+from generator.word import cap_text_to_max_height, encode_text, text_wrap, write_text
 
 from utils import config
 from utils.align import get_description_blocks_y_position, get_description_width
@@ -10,6 +11,7 @@ def add_layer(image, layer, card):
         filename = 'card_template_bot.png'
     elif layer == 'top':
         filename = f"card_template_top_{card.type}{'' if card.cost > 0 else '_base'}.png"
+        
     layerImage = Image.open(os.path.join(config.TEMPLATES_DIR,
                                          filename)).convert('RGBA').resize(
                                              (config.CARD_WIDTH_PIXELS,
@@ -17,22 +19,22 @@ def add_layer(image, layer, card):
     image.paste(layerImage, (0, 0), layerImage)
 
 
-def add_picture(img, path):
-    picture = Image.new('RGBA', (config.PIC_WIDTH, config.PIC_HEIGHT),
+def add_picture(img, path, pic_width=config.PIC_WIDTH, pic_height=config.PIC_HEIGHT):
+    picture = Image.new('RGBA', (pic_width, pic_height),
                         color='red')
     picture = Image.open(path).convert('RGBA').resize(
-        (config.PIC_WIDTH, config.PIC_HEIGHT))
+        (pic_width, pic_height))
     width, height = picture.size
 
-    left = (width - config.PIC_WIDTH) // 2
-    top = (height - config.PIC_HEIGHT) // 2
-    right = (width + config.PIC_WIDTH) // 2
-    bottom = (height + config.PIC_HEIGHT) // 2
+    left = (width - pic_width) // 2
+    top = (height - pic_height) // 2
+    right = (width + pic_width) // 2
+    bottom = (height + pic_height) // 2
 
     # Crop the center of the image
     picture = picture.crop((left, top, right, bottom))
  
-    img.paste(picture, ((config.CARD_WIDTH_PIXELS - config.PIC_WIDTH) // 2,
+    img.paste(picture, ((config.CARD_WIDTH_PIXELS - pic_width) // 2,
                         config.PIC_Y_POSITION), picture)
 
 def add_card_type_icon(image, type):
@@ -109,3 +111,30 @@ def write_lock_modifier(d, modifier: str):
     font = ImageFont.truetype(os.path.join('fonts', config.TITLE_FONT_FILE), 140)
     width, height = font.getsize(modifier)
     d.text((65 - width // 2, 95 - height // 2), modifier, fill='#4d4d4d', font=font)
+
+def write_event_title(img, name: str):
+    rotated_img = Image.new("RGBA", (config.CARD_HEIGHT_PIXELS, config.CARD_WIDTH_PIXELS), (0,0,0,0))
+    d = ImageDraw.Draw(rotated_img)
+    font = ImageFont.truetype(os.path.join('fonts', config.TITLE_FONT_FILE), config.EVENT_TITLE_FONTSIZE)
+    name_width, name_height = font.getsize(name)
+    d.text(((config.CARD_HEIGHT_PIXELS - name_width) // 2,
+             config.EVENT_TITLE_Y - name_height // 2),
+             name,
+             fill='white',
+             font=font,
+             stroke_width=3,
+             stroke_fill='black'
+             )
+    #d.rectangle((0,0, config.CARD_HEIGHT_PIXELS, config.CARD_WIDTH_PIXELS), fill=None, outline='green', width=2)
+    unrotated = rotated_img.rotate(90, expand=True)
+    img.paste(unrotated, None, unrotated)
+
+def write_event_description(img, text: str):
+    EVENT_DESCRIPTION_WIDTH = 600
+    EVENT_DESCRIPTION_HEIGHT = 120
+    rotated_img = Image.new("RGBA", (config.CARD_HEIGHT_PIXELS, config.CARD_WIDTH_PIXELS), (0,0,0,0))
+    d = ImageDraw.Draw(rotated_img)
+    paragraphs, line_height = cap_text_to_max_height(text, EVENT_DESCRIPTION_HEIGHT, EVENT_DESCRIPTION_WIDTH) 
+    write_text(d, paragraphs, (config.CARD_HEIGHT_PIXELS - EVENT_DESCRIPTION_WIDTH) // 2, config.EVENT_DESCRIPTION_Y, EVENT_DESCRIPTION_WIDTH, line_height=line_height)
+    unrotated = rotated_img.rotate(90, expand=True)
+    img.paste(unrotated, None, unrotated)

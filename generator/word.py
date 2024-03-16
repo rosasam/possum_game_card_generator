@@ -36,8 +36,7 @@ def text_wrap(words, max_width: int):
 
 # Words can have punctuation marks at the end
  # assign properties to words: bold, line break, space after, etc. join non-breaking words together
-def encode_text(text, fontsize=config.DESCRIPTION_FONTSIZE):
-    keywords = config.KEYWORDS
+def encode_text(text, fontsize=config.DESCRIPTION_FONTSIZE, keywords=config.KEYWORDS):
     words = text.split(' ')
     keywords_lower = [k.lower() for k in keywords]
     encoded_words = []
@@ -63,4 +62,18 @@ def write_text(d, paragraphs, x, y, width, center=True, line_height=config.DESCR
             y_position += line_height
         y_position += config.BREAK_MIN_SIZE
     return y_position
-        
+
+
+def cap_text_to_max_height(text: str, max_height: int, text_width: int):
+    total_height = 10000000
+    line_height = config.DESCRIPTION_LINE_HEIGHT
+    font_size = config.DESCRIPTION_FONTSIZE
+    paragraphs = []
+    while total_height > max_height:
+        words = encode_text(text, font_size)
+        paragraphs = text_wrap(words, text_width)
+        total_height = len(paragraphs[0]) * line_height
+        if total_height > max_height:
+            line_height = int(line_height / 1.1)
+            font_size = int(font_size / 1.1)
+    return paragraphs, line_height
