@@ -2,6 +2,6 @@ google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
 pandas
-Pillow
+Pillow==9.5.0
 tqdm
 fpdf

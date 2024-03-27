@@ -3,6 +3,7 @@ __pycache__/
 *.csv
 .DS_Store
 venv/*
+.venv/*
 *.pickle
 credentials.json
 .vscode/
