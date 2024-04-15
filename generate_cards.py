@@ -22,16 +22,16 @@ def get_modes(args: list[str]) -> tuple[bool, bool, bool]:
     return (testmode, single_card_mode, no_cardback_mode)
 
 
-def create_card_output_dir() -> str:
-    """Tries to create the output directory for generated cards"""
-    abs_path_to_card_save_dir = os.path.join(ABS_PATH_TO_THIS_DIR,
-                                             config.CARD_SAVE_DIR)
+def try_create_dir(dir_name: str) -> str:
+    """Tries to create a new directory"""
+    abs_path_to_new_dir = os.path.join(ABS_PATH_TO_THIS_DIR,
+                                             dir_name)
     try:
-        os.makedirs(abs_path_to_card_save_dir)  # Throws OSError if it exists
+        os.makedirs(abs_path_to_new_dir)  # Throws OSError if it exists
     except OSError:
         pass
 
-    return abs_path_to_card_save_dir
+    return abs_path_to_new_dir
 
 
 def delete_old_cards(path_to_card_dir: str):
@@ -52,8 +52,7 @@ def main(args: list[str]):
     testmode, single_card_mode, no_cardback_mode = get_modes(args)
     generator = Generator({ "testmode": testmode, "no_cardback_mode": no_cardback_mode })
 
-    abs_path_to_this_dir = os.path.dirname(os.path.abspath(__file__))
-    abs_path_to_card_save_dir = create_card_output_dir()
+    abs_path_to_card_save_dir = try_create_dir(config.CARD_SAVE_DIR)
     delete_old_cards(abs_path_to_card_save_dir)
     
     # Create source pictures directory
