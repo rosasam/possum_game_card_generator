@@ -8,18 +8,21 @@ from generator.card_generator import Generator
 from generator.card import Card
 from utils.types import get_card_type
 
-
-def main(args):
-    # Get data from Google Drive if set in config. Otherwise, get data from a csv provided
-    data = get_sheets_data()
-    # Test mode only prints one card
-    testmode = False
-    single_card_mode = False
-    no_cardback_mode = False
+def get_modes(args):
+    testmode = False            # Test mode only prints one card
+    single_card_mode = False    # Prints only 1 copy of every card
+    no_cardback_mode = False    # Doesnt print cardbacks
     if len(args) > 1:
         testmode = '--test' in args or '-t' in args
         single_card_mode = '--single' in args or '-s' in args
         no_cardback_mode = '--no-cardback' in args or '-nc' in args
+    return (testmode, single_card_mode, no_cardback_mode)
+
+
+def main(args):
+    # Get data from Google Drive if set in config. Otherwise, get data from a csv provided
+    data = get_sheets_data()
+    testmode, single_card_mode, no_cardback_mode = get_modes(args)
     generator = Generator({ "testmode": testmode, "no_cardback_mode": no_cardback_mode })
 
     abs_path_to_this_dir = os.path.dirname(os.path.abspath(__file__))
