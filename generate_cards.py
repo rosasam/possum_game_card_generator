@@ -71,7 +71,7 @@ def create_cards(data) -> list[Card]:
             continue
 
         amount = 1 if MODES.single_card else amount
-        cards.push(Card(name, cost, cardType, amount, picture_file_name, description, flavour))
+        cards.append(Card(name, cost, cardType, amount, picture_file_name, description, flavour))
     return cards
 
 
