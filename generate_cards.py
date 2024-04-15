@@ -31,6 +31,8 @@ def create_card_output_dir() -> str:
     except OSError:
         pass
 
+    return abs_path_to_card_save_dir
+
 
 def delete_old_cards(path_to_card_dir: str):
     """Delete all png, jpg, and pdf files in the given directory"""
