@@ -10,17 +10,18 @@ from generator.card import Card
 from utils.types import get_card_type
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+MODES = {
+    "test": False,          # Test mode only prints one card
+    "single_card": False,   # Prints only 1 copy of every card
+    "no_card_back": False   # Doesnt print cardbacks
+}
 
-def get_modes(args: list[str]) -> tuple[bool, bool, bool]:
+def set_modes(args: list[str]):
     """Gets the running modes"""
-    testmode = False            # Test mode only prints one card
-    single_card_mode = False    # Prints only 1 copy of every card
-    no_cardback_mode = False    # Doesnt print cardbacks
     if len(args) > 1:
-        testmode = '--test' in args or '-t' in args
-        single_card_mode = '--single' in args or '-s' in args
-        no_cardback_mode = '--no-cardback' in args or '-nc' in args
-    return (testmode, single_card_mode, no_cardback_mode)
+        MODES.test = '--test' in args or '-t' in args
+        MODES.single_card = '--single' in args or '-s' in args
+        MODES.no_card_back = '--no-cardback' in args or '-nc' in args
 
 
 def try_create_dir(dir_name: str) -> str:
@@ -46,6 +47,33 @@ def delete_old_cards(path_to_card_dir: str) -> None:
             os.remove(file)
 
 
+def create_cards(data) -> list[Card]:
+    """Create a list of all cards"""
+    cards = []
+    for file, row in data.iterrows():
+        # Change these keys to match the keys in the csv
+        field_names = config.GOOGLE_SHEETS_FIELD_NAMES
+        name = row[field_names['name']]
+        cost = int(row[field_names['cost']])
+        cardType = row[field_names['type']]
+        amount = int(row[field_names['amount']])
+        picture_file_name = create_pic_file_name(name)
+        description = row[field_names['description']]
+        flavour = row[field_names['flavour']]
+
+        cardType = get_card_type(cardType)
+        # Dont generate card if either name or amount is undefined
+        if not name and amount:
+            print(
+                f'\033[93mWARNING\033[0m: CSV row {file} missing name or amount'
+            )
+            continue
+
+        amount = 1 if MODES.single_card else amount
+        cards.push(Card(name, cost, cardType, amount, picture_file_name, description, flavour))
+    return cards
+
+
 def download_needed_images(data, path_to_src_pics):
     """Download all required and missing images"""
     # Only download images that are not already downloaded (based on image urls in spreadsheet)
@@ -66,10 +94,10 @@ def download_needed_images(data, path_to_src_pics):
 
 
 def main(args: list[str]):
+    set_modes(args)
     # Get data from Google Drive if set in config. Otherwise, get data from a csv provided
     data = get_sheets_data()
-    testmode, single_card_mode, no_cardback_mode = get_modes(args)
-    generator = Generator({ "testmode": testmode, "no_cardback_mode": no_cardback_mode })
+    generator = Generator({ "testmode": MODES.test, "no_cardback_mode": MODES.no_card_back })
 
     abs_path_to_card_save_dir = try_create_dir(config.CARD_SAVE_DIR)
     delete_old_cards(abs_path_to_card_save_dir)
@@ -78,30 +106,9 @@ def main(args: list[str]):
     download_needed_images(data, abs_path_to_picture_source_dir)
 
     # Parse card data and create cards
-    for file, row in data.iterrows():
-        # Change these keys to match the keys in the csv
-        field_names = config.GOOGLE_SHEETS_FIELD_NAMES
-        name = row[field_names['name']]
-        cost = int(row[field_names['cost']])
-        cardType = row[field_names['type']]
-        amount = int(row[field_names['amount']])
-        picture_file_name = create_pic_file_name(name)
-        description = row[field_names['description']]
-        flavour = row[field_names['flavour']]
-
-        cardType = get_card_type(cardType)
-        # Dont generate card if either name or amount is undefined
-        if not name and amount:
-            print(
-                f'\033[93mWARNING\033[0m: CSV row {file} missing name or amount'
-            )
-            continue
-
-        amount = 1 if single_card_mode else amount
-        generator.add_card(
-            Card(name, cost, cardType, amount, picture_file_name, description,
-                 flavour))
-        if testmode:
+    for card in create_cards(data):
+        generator.add_card(card)
+        if MODES.test:
             break
 
     # Generate output files
