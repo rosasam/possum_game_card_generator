@@ -1,4 +1,5 @@
 from utils import config
+from utils.file_and_path import create_pic_file_name
 
 class Card:
 
@@ -14,7 +15,7 @@ class Card:
         self.card_image_full_path = None
 
     def get_card_file_name(self):
-        file_name = f"{self.name.lower().replace(' ', '_')}"
+        file_name = create_pic_file_name(self.name)
         for forbidden_char in config.FORBIDDEN_CHARACTERS:
             file_name = file_name.replace(forbidden_char, '')
         return file_name

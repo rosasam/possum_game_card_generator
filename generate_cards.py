@@ -4,6 +4,7 @@ import glob
 
 from utils import config
 from utils.google_api import get_sheets_data, download_drive_images, get_drive_image_list
+from utils.file_and_path import create_pic_file_name
 from generator.card_generator import Generator
 from generator.card import Card
 from utils.types import get_card_type
@@ -85,7 +86,7 @@ def main(args: list[str]):
         cost = int(row[field_names['cost']])
         cardType = row[field_names['type']]
         amount = int(row[field_names['amount']])
-        picture_file_name = f"{name.lower().replace(' ', '_')}.jpg"  # Same logic as in card.py
+        picture_file_name = create_pic_file_name(name)
         description = row[field_names['description']]
         flavour = row[field_names['flavour']]
 
