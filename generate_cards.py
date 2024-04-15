@@ -9,12 +9,13 @@ from generator.card_generator import Generator
 from generator.card import Card
 from utils.types import get_card_type
 
+class Modes:
+    test = False            # Test mode only prints one card
+    single_card = False     # Prints only 1 copy of every card
+    no_card_back = False    # Doesnt print cardbacks
+
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-MODES = {
-    "test": False,          # Test mode only prints one card
-    "single_card": False,   # Prints only 1 copy of every card
-    "no_card_back": False   # Doesnt print cardbacks
-}
+MODES = Modes()
 
 def set_modes(args: list[str]):
     """Gets the running modes"""
