@@ -15,8 +15,9 @@ from . import config
 
 
 def login():
-    """
-    Logs the user in and returns the created credentials.
+    """Logs the user in and returns the created credentials.
+
+
     If a cached credentials exists, use that instead
     """
     creds = None
@@ -47,8 +48,9 @@ def login():
 
     return creds
 
-# Finds all JPEG images in google drive (directory specified in config file)
+
 def get_drive_image_list():
+    """Gets a list of all JPEG images in Google Drive"""
     creds = login()
     service = build('drive', 'v3', credentials=creds)
 
@@ -72,7 +74,9 @@ def get_drive_image_list():
             break
     return images
 
+
 def get_drive_image(img):
+    """Download the requested image from Google Drive"""
     file_id = img['id']
     creds = login()
     service = build('drive', 'v3', credentials=creds)
@@ -81,7 +85,7 @@ def get_drive_image(img):
     fh = io.BytesIO()
     downloader = MediaIoBaseDownload(fh, request)
     done = False
-    while done is False:
+    while not done:
         status, done = downloader.next_chunk()
     raw_img = fh.getvalue()
 
@@ -103,6 +107,7 @@ def download_drive_images(missing_images: list[str]):
 
 
 def get_sheets_data():
+    """Gets card data from Google Drive"""
     creds = login()
     service = build('sheets', 'v4', credentials=creds)
 
@@ -118,7 +123,3 @@ def get_sheets_data():
     else:
         # Values is an array where each row corresponds to a row in the sheets
         return pd.DataFrame(data[1:], columns=data[0])
-
-
-if __name__ == '__main__':
-    print(get_all())
