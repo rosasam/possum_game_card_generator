@@ -9,7 +9,7 @@ from generator.card_generator import Generator
 from generator.card import Card
 from utils.types import get_card_type
 
-ABS_PATH_TO_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def get_modes(args: list[str]) -> tuple[bool, bool, bool]:
     """Gets the running modes"""
@@ -25,8 +25,7 @@ def get_modes(args: list[str]) -> tuple[bool, bool, bool]:
 
 def try_create_dir(dir_name: str) -> str:
     """Tries to create a new directory"""
-    abs_path_to_new_dir = os.path.join(ABS_PATH_TO_THIS_DIR,
-                                             dir_name)
+    abs_path_to_new_dir = os.path.join(ROOT_DIR, dir_name)
     try:
         os.makedirs(abs_path_to_new_dir)  # Throws OSError if it exists
     except OSError:
