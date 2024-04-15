@@ -3,7 +3,7 @@ import os
 import glob
 
 from utils import config
-from utils.google_api import get_sheets_data, download_drive_images
+from utils.google_api import get_sheets_data, download_drive_images, get_drive_image_list
 from generator.card_generator import Generator
 from generator.card import Card
 from utils.types import get_card_type
@@ -34,7 +34,7 @@ def try_create_dir(dir_name: str) -> str:
     return abs_path_to_new_dir
 
 
-def delete_old_cards(path_to_card_dir: str):
+def delete_old_cards(path_to_card_dir: str) -> None:
     """Delete all png, jpg, and pdf files in the given directory"""
     print('Deleting old cards...')
     for name, _, _ in os.walk(path_to_card_dir):
@@ -46,6 +46,25 @@ def delete_old_cards(path_to_card_dir: str):
             os.remove(file)
 
 
+def download_needed_images(data, path_to_src_pics):
+    """Download all required and missing images"""
+    # Only download images that are not already downloaded (based on image urls in spreadsheet)
+    downloaded_images_full_path = glob.glob(os.path.join(path_to_src_pics, '*.jpg'))
+    downloaded_images = [os.path.basename(d) for d in downloaded_images_full_path]
+
+    # Images added to the spreadsheet
+    needed_card_images = [f"{name.lower().replace(' ', '_')}.jpg" for name in data[config.GOOGLE_SHEETS_FIELD_NAMES['name']]]
+    needed_card_images.append('card_back.jpg')
+
+    drive_images = get_drive_image_list()
+    missing_images = list(filter(
+        lambda image: image['name'] not in downloaded_images and image['name'] in needed_card_images, 
+        drive_images
+    ))
+
+    download_drive_images(missing_images)
+
+
 def main(args: list[str]):
     # Get data from Google Drive if set in config. Otherwise, get data from a csv provided
     data = get_sheets_data()
@@ -54,17 +73,9 @@ def main(args: list[str]):
 
     abs_path_to_card_save_dir = try_create_dir(config.CARD_SAVE_DIR)
     delete_old_cards(abs_path_to_card_save_dir)
-    
-    # Create source pictures directory
-    abs_path_to_picture_source_dir = os.path.join(abs_path_to_this_dir,
-                                                  config.PICTURE_SOURCE_DIR)
-    try:
-        os.makedirs(abs_path_to_picture_source_dir)
-    except OSError:
-        pass
 
-    # Download source pictures
-    download_drive_images(data)
+    abs_path_to_picture_source_dir = try_create_dir(config.PICTURE_SOURCE_DIR)
+    download_needed_images(data, abs_path_to_picture_source_dir)
 
     # Parse card data and create cards
     for file, row in data.iterrows():
