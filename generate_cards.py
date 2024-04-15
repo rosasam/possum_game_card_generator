@@ -8,7 +8,10 @@ from generator.card_generator import Generator
 from generator.card import Card
 from utils.types import get_card_type
 
-def get_modes(args):
+ABS_PATH_TO_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def get_modes(args: list[str]) -> tuple[bool, bool, bool]:
+    """Gets the running modes"""
     testmode = False            # Test mode only prints one card
     single_card_mode = False    # Prints only 1 copy of every card
     no_cardback_mode = False    # Doesnt print cardbacks
@@ -19,25 +22,20 @@ def get_modes(args):
     return (testmode, single_card_mode, no_cardback_mode)
 
 
-def main(args):
-    # Get data from Google Drive if set in config. Otherwise, get data from a csv provided
-    data = get_sheets_data()
-    testmode, single_card_mode, no_cardback_mode = get_modes(args)
-    generator = Generator({ "testmode": testmode, "no_cardback_mode": no_cardback_mode })
-
-    abs_path_to_this_dir = os.path.dirname(os.path.abspath(__file__))
-
-    # Create output dir
-    abs_path_to_card_save_dir = os.path.join(abs_path_to_this_dir,
+def create_card_output_dir() -> str:
+    """Tries to create the output directory for generated cards"""
+    abs_path_to_card_save_dir = os.path.join(ABS_PATH_TO_THIS_DIR,
                                              config.CARD_SAVE_DIR)
     try:
         os.makedirs(abs_path_to_card_save_dir)  # Throws OSError if it exists
     except OSError:
         pass
 
-    # Delete all old cards
+
+def delete_old_cards(path_to_card_dir: str):
+    """Delete all png, jpg, and pdf files in the given directory"""
     print('Deleting old cards...')
-    for name, _, _ in os.walk(abs_path_to_card_save_dir):
+    for name, _, _ in os.walk(path_to_card_dir):
         old_png_files = glob.glob(os.path.join(name, '*.png'))
         old_jpg_files = glob.glob(os.path.join(name, '*.jpg'))
         old_pdf_files = glob.glob(os.path.join(name, '*.pdf'))
@@ -45,6 +43,17 @@ def main(args):
         for file in old_files:
             os.remove(file)
 
+
+def main(args: list[str]):
+    # Get data from Google Drive if set in config. Otherwise, get data from a csv provided
+    data = get_sheets_data()
+    testmode, single_card_mode, no_cardback_mode = get_modes(args)
+    generator = Generator({ "testmode": testmode, "no_cardback_mode": no_cardback_mode })
+
+    abs_path_to_this_dir = os.path.dirname(os.path.abspath(__file__))
+    abs_path_to_card_save_dir = create_card_output_dir()
+    delete_old_cards(abs_path_to_card_save_dir)
+    
     # Create source pictures directory
     abs_path_to_picture_source_dir = os.path.join(abs_path_to_this_dir,
                                                   config.PICTURE_SOURCE_DIR)
