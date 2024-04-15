@@ -103,8 +103,11 @@ def download_drive_images(data):
     needed_card_images.append('card_back.jpg')
     drive_images = get_drive_image_list()
     missing_images = [img for img in drive_images if img['name'] not in downloaded_images and img['name'] in needed_card_images]
-    if missing_images:
-        print(f'Downloading {len(missing_images)} images from Drive...')
+    if not missing_images:
+        print('All needed images exist locally: no downloading needed!')
+        return
+    
+    print(f'Downloading {len(missing_images)} images from Drive...')
     for img in tqdm.tqdm(missing_images):
         get_drive_image(img)
 

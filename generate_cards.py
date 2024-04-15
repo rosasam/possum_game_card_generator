@@ -13,6 +13,9 @@ def main(args):
     # Get data from Google Drive if set in config. Otherwise, get data from a csv provided
     data = get_sheets_data()
     # Test mode only prints one card
+    testmode = False
+    single_card_mode = False
+    no_cardback_mode = False
     if len(args) > 1:
         testmode = '--test' in args or '-t' in args
         single_card_mode = '--single' in args or '-s' in args
