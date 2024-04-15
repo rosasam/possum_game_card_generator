@@ -13,9 +13,10 @@ def main(args):
     # Get data from Google Drive if set in config. Otherwise, get data from a csv provided
     data = get_sheets_data()
     # Test mode only prints one card
-    testmode = len(args) > 1 and ('--test' in args or '-t' in args)
-    single_card_mode = len(args) > 1 and ('--single' in args or '-s' in args) 
-    no_cardback_mode = len(args) > 1 and ('--no-cardback' in args or '-nc' in args)
+    if len(args) > 1:
+        testmode = '--test' in args or '-t' in args
+        single_card_mode = '--single' in args or '-s' in args
+        no_cardback_mode = '--no-cardback' in args or '-nc' in args
     generator = Generator({ "testmode": testmode, "no_cardback_mode": no_cardback_mode })
 
     abs_path_to_this_dir = os.path.dirname(os.path.abspath(__file__))
