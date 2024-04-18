@@ -1,8 +1,13 @@
 import os
+import math
+
+from fpdf import FPDF
+from PIL import Image, ImageDraw
+
 from utils import config
 from generator.cards import (
     add_description_picture,
-    add_layer,
+    add_template,
     add_card_type_icon,
     add_picture,
     write_description,
@@ -13,9 +18,7 @@ from generator.cards import (
     write_card_type,
 )
 from generator.card import Card
-from fpdf import FPDF
-from PIL import Image, ImageDraw
-import math
+
 
 
 class Generator:
@@ -28,9 +31,11 @@ class Generator:
         )
 
     def add_card(self, card: Card):
+        """Add a card to the generator"""
         self.cards.append(card)
 
     def get_all_card_image_file_paths(self):
+        """Get the path to all card image files"""
         all_card_paths = []
         for card in self.cards:
             for i in range(card.amount):
@@ -38,12 +43,13 @@ class Generator:
         return all_card_paths
 
     def generate_card(self, card: Card, full_output_path: str):
+        """Generate the requested card to the output path"""
         # TODO: Split into more functions (maybe split into image manipulator class?)
-        card_image = Image.new(
-            "RGBA", (config.CARD_WIDTH_PIXELS, config.CARD_HEIGHT_PIXELS)
+        card_image = (
+            Image.open(os.path.join(config.TEMPLATES_DIR, "card_template_bot.png"))
+            .convert("RGBA")
+            .resize((config.CARD_WIDTH_PIXELS, config.CARD_HEIGHT_PIXELS))
         )
-
-        add_layer(card_image, "bottom", card)
 
         if card.picture_file_name:
             try:
@@ -59,11 +65,11 @@ class Generator:
                     )
                 else:
                     add_picture(card_image, picture_file_path)
-            except Exception as e:
+            except OSError as e:
                 print(
-                    f'\033[93mWARNING\033[0m: Picture file "{picture_file_path}" for card "{card.name}" could not be found.'
+                    f'\033[93mWARNING\033[0m: Picture file "{picture_file_path}" for card "{card.name}" could not be found.\n{e}'
                 )
-        add_layer(card_image, "top", card)
+        add_template(card_image, card)
 
         d = ImageDraw.Draw(card_image)
         if card.type in config.EVENT_CARD_TYPES:

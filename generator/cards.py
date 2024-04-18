@@ -1,26 +1,24 @@
 import os
+
 from PIL import Image, ImageFont, ImageDraw
 from generator.description_block import create_blocks
-from generator.word import cap_text_to_max_height, encode_text, text_wrap, write_text
+from generator.word import cap_text_to_max_height, write_text
 
 from utils import config
-from utils.align import get_description_blocks_y_position, get_description_width
+from utils.align import get_description_blocks_y_position
 
 
-def add_layer(image, layer, card):
-    if layer == "bottom":
-        filename = "card_template_bot.png"
-    elif layer == "top":
-        filename = (
-            f"card_template_top_{card.type}{'' if card.cost > 0 else '_base'}.png"
-        )
+def add_template(image, card):
+    filename = (
+        f"card_template_top_{card.type}{'' if card.cost > 0 else '_base'}.png"
+    )
 
-    layerImage = (
+    layer_image = (
         Image.open(os.path.join(config.TEMPLATES_DIR, filename))
         .convert("RGBA")
         .resize((config.CARD_WIDTH_PIXELS, config.CARD_HEIGHT_PIXELS))
     )
-    image.paste(layerImage, (0, 0), layerImage)
+    image.paste(layer_image, (0, 0), layer_image)
 
 
 def add_picture(img, path, pic_width=config.PIC_WIDTH, pic_height=config.PIC_HEIGHT):
