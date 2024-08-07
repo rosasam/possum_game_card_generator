@@ -20,14 +20,18 @@ def render_tag(image, d, x, y, tag: str, inner_text: str):
         except Exception:
             effect_mod = inner_text
             font = get_icon_font()
-            width, height = font.getsize(inner_text)
+            l, t, r, b = font.getbbox(inner_text)
+            width = r-l
+            height = b-t
             d.text((x, y + (config.ICON_LARGE_SIZE_PIXELS // 2) - height // 2), effect_mod, fill='black', font=font)
             draw_icon(image, x + width + 5, y, tag) 
         
     if tag in ['steal', 'lock']:
         effect_mod = inner_text
         font = get_icon_font()
-        width, height = font.getsize(inner_text)
+        l, t, r, b = font.getbbox(inner_text)
+        width = r-l
+        height = b-t
         d.text((x, y + (config.ICON_LARGE_SIZE_PIXELS // 2) - height // 2), effect_mod, fill='black', font=font)
         draw_icon(image, x + width + 5, y, tag)
 
@@ -46,7 +50,7 @@ def get_nut_icons_positions(n_nuts: int):
 
 def get_icon_and_text_width(text) -> int:
     font = get_icon_font()
-    width, _ = font.getsize(text)
+    width = font.getlength(text)
     return config.ICON_LARGE_SIZE_PIXELS + width + 5
 
 def get_icon_font():

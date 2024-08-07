@@ -87,20 +87,20 @@ def add_nuts(image, nuts: int):
 
 
 def write_nut_cost(d, cost: int):
-    if cost < 1:
+    if cost < 1 or cost == 10:
         return
     fontsize = config.COST_FONT_SIZE
     font = ImageFont.truetype(os.path.join("fonts", config.COST_FONT_FILE), fontsize)
     text = str(cost)
-    cost_width, cost_height = font.getsize(text)
     d.text(
         (
-            config.COST_X_POSITION - (cost_width // 2),
-            config.COST_Y_POSITION - cost_height // 2,
+            config.COST_X_POSITION,
+            config.COST_Y_POSITION,
         ),
         text,
         fill="black",
         font=font,
+        anchor='mm',
     )
 
 
@@ -108,21 +108,20 @@ def write_title(d, text):
     text = text.upper()
     fontsize = config.TITLE_FONTSIZE
     font = ImageFont.truetype(os.path.join("fonts", config.TITLE_FONT_FILE), fontsize)
-    name_width, name_height = font.getsize(text)
-    while name_width > config.CARD_WIDTH_PIXELS - config.TITLE_MARGIN * 2:
+    while font.getlength(text) > config.CARD_WIDTH_PIXELS - config.TITLE_MARGIN * 2:
         fontsize -= 2
         font = ImageFont.truetype(
             os.path.join("fonts", config.TITLE_FONT_FILE), fontsize
         )
-        name_width, name_height = font.getsize(text)
     d.text(
         (
-            (config.CARD_WIDTH_PIXELS - name_width) // 2,
-            config.TITLE_Y_POSITION - name_height // 2,
+            config.CARD_WIDTH_PIXELS // 2,
+            config.TITLE_Y_POSITION,
         ),
         text,
         fill="black",
         font=font,
+        anchor='mm',
     )
 
 
@@ -148,16 +147,8 @@ def write_card_type(d, card):
         os.path.join("fonts", config.CARD_TYPE_TEXT_FONT),
         config.CARD_TYPE_TEXT_FONT_SIZE,
     )
-    width, _ = font.getsize(type)
-    x_pos = config.CARD_TYPE_TEXT_X_POSITION - (width // 2)
-    d.text((x_pos, config.CARD_TYPE_TEXT_Y_POSITION), type, fill="black", font=font)
-
-
-# Deprecated
-def write_lock_modifier(d, modifier: str):
-    font = ImageFont.truetype(os.path.join("fonts", config.TITLE_FONT_FILE), 140)
-    width, height = font.getsize(modifier)
-    d.text((65 - width // 2, 95 - height // 2), modifier, fill="#4d4d4d", font=font)
+    x_pos = config.CARD_TYPE_TEXT_X_POSITION
+    d.text((x_pos, config.CARD_TYPE_TEXT_Y_POSITION), type, fill="black", font=font, anchor='mm')
 
 
 def write_event_title(img, name: str):
@@ -168,17 +159,17 @@ def write_event_title(img, name: str):
     font = ImageFont.truetype(
         os.path.join("fonts", config.TITLE_FONT_FILE), config.EVENT_TITLE_FONTSIZE
     )
-    name_width, name_height = font.getsize(name)
     d.text(
         (
-            (config.CARD_HEIGHT_PIXELS - name_width) // 2,
-            config.EVENT_TITLE_Y - name_height // 2,
+            config.CARD_HEIGHT_PIXELS // 2,
+            config.EVENT_TITLE_Y,
         ),
         name,
         fill="white",
         font=font,
         stroke_width=3,
         stroke_fill="black",
+        anchor='mm',
     )
     # d.rectangle((0,0, config.CARD_HEIGHT_PIXELS, config.CARD_WIDTH_PIXELS), fill=None, outline='green', width=2)
     unrotated = rotated_img.rotate(90, expand=True)

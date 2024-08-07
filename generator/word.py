@@ -10,7 +10,7 @@ class Word:
             self.font = ImageFont.truetype(os.path.join('fonts', config.DESCRIPTION_FONT_FILE), fontsize)
         self.text = text
         self.space_after = space_after
-        self.length = self.font.getsize(text)[0] + space_after
+        self.length = self.font.getlength(text) + space_after
     
     
 # Splits words into lines, and lines into paragraphs (based on break tag)
