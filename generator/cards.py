@@ -68,24 +68,6 @@ def add_card_type_icon(image, type):
     )
 
 
-# Deprecated
-def add_nuts(image, nuts: int):
-    if nuts < 1:
-        return
-    filename = "card_template_NUT.png"
-    filepath = os.path.join(config.TEMPLATES_DIR, filename)
-    layerImage = (
-        Image.open(filepath)
-        .convert("RGBA")
-        .resize((config.CARD_WIDTH_PIXELS, config.CARD_HEIGHT_PIXELS))
-    )
-
-    for i in range(nuts):
-        offset = (nuts - 1) * config.NUT_SPACING // 2
-        x = config.NUT_SPACING * (nuts - i - 1) - offset
-        image.paste(layerImage, (x, 0), layerImage)
-
-
 def write_nut_cost(d, cost: int):
     if cost < 1 or cost == 10:
         return
