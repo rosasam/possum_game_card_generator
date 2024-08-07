@@ -42,11 +42,9 @@ def add_picture(img, path, pic_width=config.PIC_WIDTH, pic_height=config.PIC_HEI
 
 
 def add_description_picture(
-    img, path, pic_width=config.PIC_WIDTH, pic_height=config.PIC_HEIGHT
+    img: Image, path: str, pic_width:int=config.PIC_WIDTH, pic_height:int=config.PIC_HEIGHT
 ):
-    picture = Image.new("RGBA", (pic_width, pic_height), color="red")
     picture = Image.open(path).convert("RGBA").resize((pic_width, pic_height))
-
     img.paste(
         picture,
         (0, 0),
