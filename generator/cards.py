@@ -73,10 +73,7 @@ def write_nut_cost(d, cost: int):
     font = ImageFont.truetype(os.path.join("fonts", config.COST_FONT_FILE), fontsize)
     text = str(cost)
     d.text(
-        (
-            config.COST_X_POSITION,
-            config.COST_Y_POSITION,
-        ),
+        (config.COST_X_POSITION, config.COST_Y_POSITION),
         text,
         fill="black",
         font=font,
@@ -119,16 +116,22 @@ def write_description(image, d, text):
 
 
 def write_card_type(d, card):
-    type = card.type.upper()
-    base = card.cost < 0
     if card.type == "event":
         return
+    
     font = ImageFont.truetype(
         os.path.join("fonts", config.CARD_TYPE_TEXT_FONT),
         config.CARD_TYPE_TEXT_FONT_SIZE,
     )
     x_pos = config.CARD_TYPE_TEXT_X_POSITION
-    d.text((x_pos, config.CARD_TYPE_TEXT_Y_POSITION), type, fill="black", font=font, anchor='mm')
+    y_pos = config.CARD_TYPE_TEXT_Y_POSITION
+    d.text(
+        (x_pos, y_pos),
+        card.type.upper(),
+        fill="black",
+        font=font,
+        anchor='mm',
+    )
 
 
 def write_event_title(img, name: str):
