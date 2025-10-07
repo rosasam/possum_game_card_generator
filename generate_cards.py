@@ -55,7 +55,11 @@ def create_cards(data) -> list[Card]:
         # Change these keys to match the keys in the csv
         field_names = config.GOOGLE_SHEETS_FIELD_NAMES
         name = row[field_names['name']]
-        cost = int(row[field_names['cost']])
+        if not name:
+            continue
+        print(name)
+        cost_str = row[field_names['cost']]
+        cost =int(cost_str)  if cost_str != '' else 0
         cardType = row[field_names['type']]
         amount = int(row[field_names['amount']])
         picture_file_name = create_pic_file_name(name)
@@ -82,12 +86,12 @@ def download_needed_images(data, path_to_src_pics):
     downloaded_images = [os.path.basename(d) for d in downloaded_images_full_path]
 
     # Images added to the spreadsheet
-    needed_card_images = [f"{name.lower().replace(' ', '_')}.jpg" for name in data[config.GOOGLE_SHEETS_FIELD_NAMES['name']]]
+    needed_card_images = [f"{name.lower().replace(' ', '_')}.jpg" for name in data[config.GOOGLE_SHEETS_FIELD_NAMES['name']] if name is not None]
     needed_card_images.append('card_back.jpg')
 
     drive_images = get_drive_image_list()
     missing_images = list(filter(
-        lambda image: image['name'] not in downloaded_images and image['name'] in needed_card_images, 
+        lambda image: image['name'] not in downloaded_images and image['name'] in needed_card_images,
         drive_images
     ))
 
